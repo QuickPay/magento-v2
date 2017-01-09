@@ -15,6 +15,7 @@ Implemented so far:
 ### Installation
 ```
 composer require quickpay/magento2
+php bin/magento module:enable QuickPay_Payment
 php bin/magento setup:upgrade
 ```
 
