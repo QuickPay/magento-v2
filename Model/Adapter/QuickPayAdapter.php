@@ -1,0 +1,175 @@
+<?php
+namespace QuickPay\Payment\Model\Adapter;
+
+use Psr\Log\LoggerInterface;
+use \Magento\Framework\UrlInterface;
+use QuickPay\QuickPay;
+
+/**
+ * Class QuickPayAdapter
+ */
+class QuickPayAdapter
+{
+    const PUBLIC_KEY_XML_PATH = 'payment/quickpay/public_key';
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    protected $_url;
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $_scopeConfig;
+
+    public function __construct(
+        LoggerInterface $logger,
+        UrlInterface $url,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+    )
+    {
+        $this->logger = $logger;
+        $this->_url = $url;
+        $this->_scopeConfig = $scopeConfig;
+    }
+
+    /**
+     * Authorize payment and create payment link
+     *
+     * @param array $attributes
+     * @return boolean
+     */
+    public function authorizeAndCreatePaymentLink(array $attributes)
+    {
+        try {
+            $api_key = $this->_scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $client = new QuickPay(":{$api_key}");
+
+            $form = array(
+                'order_id' => $attributes['INVOICE'],
+                'currency' => $attributes['CURRENCY'],
+            );
+
+            $payments = $client->request->post('/payments', $form);
+            $paymentArray = $payments->asArray();
+            $paymentId = $paymentArray['id'];
+
+            $parameters = array(
+                "amount"                       => $attributes['AMOUNT'],
+                "continueurl"                  => $this->_url->getUrl('quickpay/payment/returnAction'),
+                "cancelurl"                    => $this->_url->getUrl('quickpay/payment/cancelAction'),
+                "callbackurl"                  => $this->_url->getUrl('quickpay/payment/callback'),
+                "customer_email"               => $attributes['EMAIL'],
+            );
+
+            //Create payment link and return payment id
+            $paymentLink = $client->request->put(sprintf('/payments/%s/link', $paymentId), $parameters)->asArray();
+            $paymentArray['link'] = $paymentLink['url'];
+
+            return $paymentArray;
+        } catch (\Exception $e) {
+            $this->logger->critical($e->getMessage());
+        }
+
+        return true;
+    }
+
+    /**
+     * Capture QuickPay payment
+     *
+     * @param array $attributes
+     * @return array|bool
+     */
+    public function capture(array $attributes)
+    {
+        try {
+            $api_key = $this->_scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $client = new QuickPay(":{$api_key}");
+
+            $form = array(
+                'id'     => $attributes['TXN_ID'],
+                'amount' => $attributes['AMOUNT'],
+            );
+
+            $id = $attributes['TXN_ID'];
+
+            $payments = $client->request->post("/payments/{$id}/capture", $form);
+            $paymentArray = $payments->asArray();
+
+            return $paymentArray;
+        } catch (\Exception $e) {
+            $this->logger->critical($e->getMessage());
+        }
+
+        return true;
+    }
+
+    /**
+     * Cancel QuickPay payment
+     *
+     * @param array $attributes
+     * @return array|bool
+     */
+    public function cancel(array $attributes)
+    {
+        $this->logger->debug("Cancel payment");
+        try {
+            $api_key = $this->_scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $client = new QuickPay(":{$api_key}");
+
+            $form = array(
+                'id' => $attributes['TXN_ID'],
+            );
+
+            $this->logger->debug(var_export($form, true));
+
+            $id = $attributes['TXN_ID'];
+
+            $payments = $client->request->post("/payments/{$id}/cancel", $form);
+            $paymentArray = $payments->asArray();
+
+            $this->logger->debug(var_export($paymentArray, true));
+
+            return $paymentArray;
+        } catch (\Exception $e) {
+            $this->logger->critical($e->getMessage());
+        }
+
+        return true;
+    }
+
+    public function refund(array $attributes)
+    {
+        $this->logger->debug("Refund payment");
+
+        try {
+            $api_key = $this->_scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $client = new QuickPay(":{$api_key}");
+
+            $form = array(
+                'id' => $attributes['TXN_ID'],
+                'amount' => $attributes['AMOUNT'],
+            );
+
+            $this->logger->debug(var_export($form, true));
+
+            $id = $attributes['TXN_ID'];
+
+            $payments = $client->request->post("/payments/{$id}/refund", $form);
+            $paymentArray = $payments->asArray();
+
+            $this->logger->debug(var_export($paymentArray, true));
+
+            return $paymentArray;
+        } catch (\Exception $e) {
+            $this->logger->critical($e->getMessage());
+        }
+
+        return true;
+    }
+}
