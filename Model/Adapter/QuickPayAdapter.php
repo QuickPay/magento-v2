@@ -80,7 +80,7 @@ class QuickPayAdapter
     }
 
     /**
-     * Capture QuickPay payment
+     * Capture payment
      *
      * @param array $attributes
      * @return array|bool
@@ -110,7 +110,7 @@ class QuickPayAdapter
     }
 
     /**
-     * Cancel QuickPay payment
+     * Cancel payment
      *
      * @param array $attributes
      * @return array|bool
@@ -143,6 +143,12 @@ class QuickPayAdapter
         return true;
     }
 
+    /**
+     * Refund payment
+     *
+     * @param array $attributes
+     * @return array|bool
+     */
     public function refund(array $attributes)
     {
         $this->logger->debug("Refund payment");

@@ -1,6 +1,8 @@
 <?php
 namespace QuickPay\Payment\Gateway\Response;
 
+use Magento\Payment\Gateway\Helper\ContextHelper;
+use Magento\Payment\Gateway\Helper\SubjectReader;
 use Psr\Log\LoggerInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Response\HandlerInterface;
@@ -26,20 +28,14 @@ class TransactionIdHandler implements HandlerInterface
      */
     public function handle(array $handlingSubject, array $response)
     {
-        if (!isset($handlingSubject['payment'])
-            || !$handlingSubject['payment'] instanceof PaymentDataObjectInterface
-        ) {
-            throw new \InvalidArgumentException('Payment data object should be provided');
-        }
-
         /** @var PaymentDataObjectInterface $paymentDO */
-        $paymentDO = $handlingSubject['payment'];
+        $paymentDO = SubjectReader::readPayment($handlingSubject);
 
         $payment = $paymentDO->getPayment();
+        ContextHelper::assertOrderPayment($payment);
 
         $responseObject = $response['object'];
 
-        //Create transaction entry
         /** @var $payment \Magento\Sales\Model\Order\Payment */
         $payment->setTransactionId($responseObject['id']);
         $payment->setIsTransactionClosed(false);

@@ -2,11 +2,13 @@
 namespace QuickPay\Payment\Gateway\Response;
 
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
+use Magento\Payment\Gateway\Helper\ContextHelper;
+use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 
 class PaymentLinkHandler implements HandlerInterface
 {
-    const PAYMENT_LINK = 'payment_link';
+    const PAYMENT_LINK = 'paymentLink';
 
     /**
      * @var LoggerInterface
@@ -27,16 +29,11 @@ class PaymentLinkHandler implements HandlerInterface
      */
     public function handle(array $handlingSubject, array $response)
     {
-        if (!isset($handlingSubject['payment'])
-            || !$handlingSubject['payment'] instanceof PaymentDataObjectInterface
-        ) {
-            throw new \InvalidArgumentException('Payment data object should be provided');
-        }
-
         /** @var PaymentDataObjectInterface $paymentDO */
-        $paymentDO = $handlingSubject['payment'];
+        $paymentDO = SubjectReader::readPayment($handlingSubject);
 
         $payment = $paymentDO->getPayment();
+        ContextHelper::assertOrderPayment($payment);
 
         $responseObject = $response['object'];
 

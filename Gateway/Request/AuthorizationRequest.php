@@ -1,47 +1,42 @@
 <?php
 namespace QuickPay\Payment\Gateway\Request;
 
-use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
+use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 
 class AuthorizationRequest implements BuilderInterface
 {
     /**
-     * @var ConfigInterface
+     * @var SubjectReader
      */
-    private $config;
+    private $subjectReader;
 
     /**
-     * @param ConfigInterface $config
+     * @param SubjectReader $subjectReader
      */
-    public function __construct(ConfigInterface $config)
+    public function __construct(SubjectReader $subjectReader)
     {
-        $this->config = $config;
+        $this->subjectReader = $subjectReader;
     }
 
     /**
-     * Builds ENV request
+     * Builds authorization request
      *
      * @param array $buildSubject
      * @return array
      */
     public function build(array $buildSubject)
     {
-        if (!isset($buildSubject['payment'])
-            || !$buildSubject['payment'] instanceof PaymentDataObjectInterface
-        ) {
-            throw new \InvalidArgumentException('Payment data object should be provided');
-        }
-
         /** @var PaymentDataObjectInterface $paymentDO */
-        $paymentDO = $buildSubject['payment'];
+        $paymentDO = $this->subjectReader->readPayment($buildSubject);
+        $amount = $this->subjectReader->readAmount($buildSubject) * 100;
         $order = $paymentDO->getOrder();
         $address = $order->getShippingAddress();
 
         return [
             'INVOICE'      => $order->getOrderIncrementId(),
-            'AMOUNT'       => $order->getGrandTotalAmount() * 100, //Get order total in cents
+            'AMOUNT'       => $amount, //Get order total in cents
             'CURRENCY'     => $order->getCurrencyCode(),
             'EMAIL'        => $address->getEmail(),
         ];

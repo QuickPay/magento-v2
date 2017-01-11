@@ -1,18 +1,18 @@
 <?php
 namespace QuickPay\Payment\Gateway\Request;
 
-use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
+use Magento\Payment\Gateway\Helper\ContextHelper;
+use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Psr\Log\LoggerInterface;
 
 class CancelRequest implements BuilderInterface
 {
     /**
-     * @var ConfigInterface
+     * @var SubjectReader
      */
-    private $config;
+    private $subjectReader;
 
     /**
      * @var LoggerInterface
@@ -20,11 +20,12 @@ class CancelRequest implements BuilderInterface
     protected $logger;
 
     /**
-     * @param ConfigInterface $config
+     * @param SubjectReader $subjectReader
+     * @param LoggerInterface $logger
      */
-    public function __construct(ConfigInterface $config, LoggerInterface $logger)
+    public function __construct(SubjectReader $subjectReader, LoggerInterface $logger)
     {
-        $this->config = $config;
+        $this->subjectReader = $subjectReader;
         $this->logger = $logger;
     }
 
@@ -36,21 +37,11 @@ class CancelRequest implements BuilderInterface
      */
     public function build(array $buildSubject)
     {
-        if (!isset($buildSubject['payment'])
-            || !$buildSubject['payment'] instanceof PaymentDataObjectInterface
-        ) {
-            throw new \InvalidArgumentException('Payment data object should be provided');
-        }
-
-        $this->logger->debug("Building cancel request");
-
         /** @var PaymentDataObjectInterface $paymentDO */
-        $paymentDO = $buildSubject['payment'];
+        $paymentDO = $this->subjectReader->readPayment($buildSubject);
         $payment = $paymentDO->getPayment();
 
-        if (!$payment instanceof OrderPaymentInterface) {
-            throw new \LogicException('Order payment should be provided.');
-        }
+        ContextHelper::assertOrderPayment($payment);
 
         return [
             'TXN_ID' => $payment->getLastTransId(),

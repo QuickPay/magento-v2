@@ -8,8 +8,10 @@ Coded and tested in Magento 2.1.2, compatibility with other versions has not bee
 
 Implemented so far:
 * Authorize
-* Capture
+* Capture 
+* Partial Capture
 * Refund
+* Partial Refund
 * Cancel
 
 ### Installation
