@@ -27,8 +27,9 @@
                 <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <testmode>0</testmode>
                 <sort_order>1</sort_order>
+                <payment_methods></payment_methods>
                 <privateInfoKeys></privateInfoKeys>
-                <paymentInfoKeys></paymentInfoKeys>
+                <paymentInfoKeys>cc_type,cc_number</paymentInfoKeys>
             </quickpay>
         </payment>
     </default>

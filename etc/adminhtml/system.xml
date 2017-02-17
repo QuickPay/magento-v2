@@ -8,7 +8,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
-            <group id="quickpay" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="quickpay" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>QuickPay</label>
                 <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Enabled</label>
@@ -33,20 +33,28 @@
                     <label>Testmode Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="allowspecific" translate="label" type="allowspecific" sortOrder="70" showInDefault="9"
-                       showInWebsite="1" showInStore="0">
+                <field id="allowspecific" translate="label" type="allowspecific" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Payment From Applicable Countries</label>
                     <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
                 </field>
-                <field id="specificcountry" translate="label" type="multiselect" sortOrder="80" showInDefault="1"
-                       showInWebsite="1" showInStore="0">
+                <field id="specificcountry" translate="label" type="multiselect" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Payment From Specific Countries</label>
                     <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
                 </field>
-                <field id="sort_order" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1"
-                       showInStore="0">
+                <field id="sort_order" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
                     <frontend_class>validate-number</frontend_class>
+                </field>
+                <field id="payment_methods" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Payment Methods</label>
+                    <source_model>QuickPay\Payment\Model\Config\Source\PaymentMethods</source_model>
+                </field>
+                <field id="payment_method_specified" translate="label comment" type="text" sortOrder="105" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Payment Method</label>
+                    <comment>Type in the cards you wish to accept (comma separated). See the valid payment types here: <![CDATA[<a href="http://tech.quickpay.net/appendixes/payment-methods/" target="_blank" rel="noopener">http://tech.quickpay.net/appendixes/payment-methods/</a>]]></comment>
+                    <depends>
+                        <field id="*/*/payment_methods">specified</field>
+                    </depends>
                 </field>
             </group>
         </section>

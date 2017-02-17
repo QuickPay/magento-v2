@@ -23,6 +23,11 @@ class QuickPayAdapter
     protected $_url;
 
     /**
+     * @var \QuickPay\Payment\Helper\Data
+     */
+    protected $helper;
+
+    /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $_scopeConfig;
@@ -30,11 +35,13 @@ class QuickPayAdapter
     public function __construct(
         LoggerInterface $logger,
         UrlInterface $url,
+        \QuickPay\Payment\Helper\Data $helper,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     )
     {
         $this->logger = $logger;
         $this->_url = $url;
+        $this->helper = $helper;
         $this->_scopeConfig = $scopeConfig;
     }
 
@@ -65,6 +72,7 @@ class QuickPayAdapter
                 "cancelurl"                    => $this->_url->getUrl('quickpay/payment/cancelAction'),
                 "callbackurl"                  => $this->_url->getUrl('quickpay/payment/callback'),
                 "customer_email"               => $attributes['EMAIL'],
+                "payment_methods"              => $this->helper->getPaymentMethods(),
             );
 
             //Create payment link and return payment id
