@@ -10,7 +10,8 @@ use QuickPay\QuickPay;
  */
 class QuickPayAdapter
 {
-    const PUBLIC_KEY_XML_PATH = 'payment/quickpay/public_key';
+    const PUBLIC_KEY_XML_PATH      = 'payment/quickpay/public_key';
+    const TRANSACTION_FEE_XML_PATH = 'payment/quickpay/transaction_fee';
 
     /**
      * @var LoggerInterface
@@ -57,23 +58,24 @@ class QuickPayAdapter
             $api_key = $this->_scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $client = new QuickPay(":{$api_key}");
 
-            $form = array(
+            $form = [
                 'order_id' => $attributes['INVOICE'],
                 'currency' => $attributes['CURRENCY'],
-            );
+            ];
 
             $payments = $client->request->post('/payments', $form);
             $paymentArray = $payments->asArray();
             $paymentId = $paymentArray['id'];
 
-            $parameters = array(
-                "amount"                       => $attributes['AMOUNT'],
-                "continueurl"                  => $this->_url->getUrl('quickpay/payment/returnAction'),
-                "cancelurl"                    => $this->_url->getUrl('quickpay/payment/cancelAction'),
-                "callbackurl"                  => $this->_url->getUrl('quickpay/payment/callback'),
-                "customer_email"               => $attributes['EMAIL'],
-                "payment_methods"              => $this->helper->getPaymentMethods(),
-            );
+            $parameters = [
+                "amount"             => $attributes['AMOUNT'],
+                "continueurl"        => $this->_url->getUrl('quickpay/payment/returnAction'),
+                "cancelurl"          => $this->_url->getUrl('quickpay/payment/cancelAction'),
+                "callbackurl"        => $this->_url->getUrl('quickpay/payment/callback'),
+                "customer_email"     => $attributes['EMAIL'],
+                "payment_methods"    => $this->helper->getPaymentMethods(),
+                "auto_fee"           => $this->_scopeConfig->isSetFlag(self::TRANSACTION_FEE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
+            ];
 
             //Create payment link and return payment id
             $paymentLink = $client->request->put(sprintf('/payments/%s/link', $paymentId), $parameters)->asArray();
@@ -99,10 +101,10 @@ class QuickPayAdapter
             $api_key = $this->_scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $client = new QuickPay(":{$api_key}");
 
-            $form = array(
+            $form = [
                 'id'     => $attributes['TXN_ID'],
                 'amount' => $attributes['AMOUNT'],
-            );
+            ];
 
             $id = $attributes['TXN_ID'];
 
@@ -130,9 +132,9 @@ class QuickPayAdapter
             $api_key = $this->_scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $client = new QuickPay(":{$api_key}");
 
-            $form = array(
+            $form = [
                 'id' => $attributes['TXN_ID'],
-            );
+            ];
 
             $this->logger->debug(var_export($form, true));
 
@@ -165,10 +167,10 @@ class QuickPayAdapter
             $api_key = $this->_scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $client = new QuickPay(":{$api_key}");
 
-            $form = array(
+            $form = [
                 'id' => $attributes['TXN_ID'],
                 'amount' => $attributes['AMOUNT'],
-            );
+            ];
 
             $this->logger->debug(var_export($form, true));
 
