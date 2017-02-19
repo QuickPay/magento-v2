@@ -28,6 +28,11 @@ class Callback extends \Magento\Framework\App\Action\Action
     protected $order;
 
     /**
+     * @var Order\Email\Sender\OrderSender
+     */
+    protected $orderSender;
+
+    /**
      * Class constructor
      * @param \Magento\Framework\App\Action\Context              $context
      * @param \Psr\Log\LoggerInterface                           $logger
@@ -37,12 +42,14 @@ class Callback extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Action\Context $context,
         \Psr\Log\LoggerInterface $logger,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Sales\Api\Data\OrderInterface $order
+        \Magento\Sales\Api\Data\OrderInterface $order,
+        \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
     )
     {
         $this->scopeConfig = $scopeConfig;
         $this->logger = $logger;
         $this->order = $order;
+        $this->orderSender = $orderSender;
 
         parent::__construct($context);
     }
@@ -75,7 +82,7 @@ class Callback extends \Magento\Framework\App\Action\Action
             if ($checksum === $submittedChecksum) {
                 /**
                  * Load order by incrementId
-                 * @var $order Order
+                 * @var Order $order
                  */
                 $order = $this->order->loadByIncrementId($response->order_id);
 
@@ -109,6 +116,10 @@ class Callback extends \Magento\Framework\App\Action\Action
                         ->save();
                 }
 
+                //Send order email
+                if (!$order->getEmailSent()) {
+                    $this->sendOrderConfirmation($order);
+                }
             } else {
                 $this->logger->debug('Checksum mismatch');
                 return;
@@ -185,5 +196,24 @@ class Callback extends \Magento\Framework\App\Action\Action
         $order->setSubtotal($order->getSubtotal() + $feeTotal);
 
         return $order;
+    }
+
+    /**
+     * Send order confirmation email
+     *
+     * @param \Magento\Sales\Model\Order $order
+     */
+    private function sendOrderConfirmation($order)
+    {
+        try {
+            $this->orderSender->send($order);
+            $order->addStatusHistoryComment(__('Order confirmation email sent to customer'))
+                  ->setIsCustomerNotified(true)
+                  ->save();
+        } catch (\Exception $e) {
+            $order->addStatusHistoryComment(__('Failed to send order confirmation email: %s', $e->getMessage()))
+                  ->setIsCustomerNotified(false)
+                  ->save();
+        }
     }
 }

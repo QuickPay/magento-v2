@@ -53,6 +53,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
             //TODO: Refactor this to use repository?
             $order->setState(\Magento\Sales\Model\Order::STATE_NEW)
                 ->setStatus($order->getConfig()->getStateDefaultStatus(\Magento\Sales\Model\Order::STATE_NEW))
+                ->addStatusHistoryComment(__("Order placed and pending payment"))
                 ->save();
 
             return $this->_redirect($paymentLink);
