@@ -21,7 +21,7 @@ class QuickPayAdapter
     /**
      * @var \Magento\Framework\UrlInterface
      */
-    protected $_url;
+    protected $url;
 
     /**
      * @var \QuickPay\Payment\Helper\Data
@@ -31,7 +31,7 @@ class QuickPayAdapter
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    protected $scopeConfig;
 
     public function __construct(
         LoggerInterface $logger,
@@ -41,9 +41,9 @@ class QuickPayAdapter
     )
     {
         $this->logger = $logger;
-        $this->_url = $url;
+        $this->url = $url;
         $this->helper = $helper;
-        $this->_scopeConfig = $scopeConfig;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -55,11 +55,11 @@ class QuickPayAdapter
     public function authorizeAndCreatePaymentLink(array $attributes)
     {
         try {
-            $api_key = $this->_scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $client = new QuickPay(":{$api_key}");
 
             $form = [
-                'order_id' => $attributes['INVOICE'],
+                'order_id' => $attributes['INCREMENT_ID'],
                 'currency' => $attributes['CURRENCY'],
             ];
 
@@ -69,12 +69,12 @@ class QuickPayAdapter
 
             $parameters = [
                 "amount"             => $attributes['AMOUNT'],
-                "continueurl"        => $this->_url->getUrl('quickpay/payment/returnAction'),
-                "cancelurl"          => $this->_url->getUrl('quickpay/payment/cancelAction'),
-                "callbackurl"        => $this->_url->getUrl('quickpay/payment/callback'),
+                "continueurl"        => $this->url->getUrl('quickpay/payment/returnAction'),
+                "cancelurl"          => $this->url->getUrl('quickpay/payment/cancelAction'),
+                "callbackurl"        => $this->url->getUrl('quickpay/payment/callback'),
                 "customer_email"     => $attributes['EMAIL'],
                 "payment_methods"    => $this->helper->getPaymentMethods(),
-                "auto_fee"           => $this->_scopeConfig->isSetFlag(self::TRANSACTION_FEE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
+                "auto_fee"           => $this->scopeConfig->isSetFlag(self::TRANSACTION_FEE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
             ];
 
             //Create payment link and return payment id
@@ -98,7 +98,7 @@ class QuickPayAdapter
     public function capture(array $attributes)
     {
         try {
-            $api_key = $this->_scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $client = new QuickPay(":{$api_key}");
 
             $form = [
@@ -129,7 +129,7 @@ class QuickPayAdapter
     {
         $this->logger->debug("Cancel payment");
         try {
-            $api_key = $this->_scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $client = new QuickPay(":{$api_key}");
 
             $form = [
@@ -164,7 +164,7 @@ class QuickPayAdapter
         $this->logger->debug("Refund payment");
 
         try {
-            $api_key = $this->_scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $client = new QuickPay(":{$api_key}");
 
             $form = [

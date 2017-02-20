@@ -4,7 +4,6 @@ namespace QuickPay\Payment\Gateway\Http;
 use Magento\Payment\Gateway\Http\TransferBuilder;
 use Magento\Payment\Gateway\Http\TransferFactoryInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
-use Magento\Payment\Gateway\ConfigInterface;
 
 class TransferFactory implements TransferFactoryInterface
 {

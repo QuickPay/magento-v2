@@ -50,12 +50,6 @@ class Redirect extends \Magento\Framework\App\Action\Action
             $order = $this->_getCheckout()->getLastRealOrder();
             $paymentLink = $order->getPayment()->getAdditionalInformation(\QuickPay\Payment\Gateway\Response\PaymentLinkHandler::PAYMENT_LINK);
 
-            //TODO: Refactor this to use repository?
-            $order->setState(\Magento\Sales\Model\Order::STATE_NEW)
-                ->setStatus($order->getConfig()->getStateDefaultStatus(\Magento\Sales\Model\Order::STATE_NEW))
-                ->addStatusHistoryComment(__("Order placed and pending payment"))
-                ->save();
-
             return $this->_redirect($paymentLink);
         } catch (\Exception $e) {
             $this->messageManager->addException($e, __('Something went wrong, please try again later'));

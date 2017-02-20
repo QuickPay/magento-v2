@@ -2,8 +2,6 @@
 
 namespace QuickPay\Payment\Gateway\Http\Client;
 
-use Magento\Payment\Gateway\Http\Client\Zend;
-
 class TransactionAuthorize extends AbstractTransaction
 {
     /**

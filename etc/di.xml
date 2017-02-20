@@ -171,4 +171,9 @@
             <argument name="config" xsi:type="object">QuickPayConfig</argument>
         </arguments>
     </type>
+
+    <!-- Around plugin to set order status -->
+    <type name="Magento\Sales\Model\Order\Payment\State\CommandInterface">
+        <plugin name="quickpay_set_order_status" type="QuickPay\Payment\Plugin\Model\Order\Payment\State\CommandInterface" sortOrder="1" />
+    </type>
 </config>
