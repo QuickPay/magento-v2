@@ -80,45 +80,49 @@ class Callback extends \Magento\Framework\App\Action\Action
             $submittedChecksum = $this->getRequest()->getServer('HTTP_QUICKPAY_CHECKSUM_SHA256');
 
             if ($checksum === $submittedChecksum) {
-                /**
-                 * Load order by incrementId
-                 * @var Order $order
-                 */
-                $order = $this->order->loadByIncrementId($response->order_id);
+                //Make sure that payment is accepted
+                if ($response->accepted === true) {
+                    /**
+                     * Load order by incrementId
+                     * @var Order $order
+                     */
+                    $order = $this->order->loadByIncrementId($response->order_id);
 
-                if (! $order->getId()) {
-                    $this->logger->debug('Failed to load order with id: '. $response->order_id);
-                    return;
-                }
-
-                //Cancel order if testmode is disabled and this is a test payment
-                $testMode = $this->scopeConfig->isSetFlag(self::TESTMODE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-
-                if (! $testMode && $response->test_mode === true) {
-                    $this->logger->debug('Order attempted paid with a test card but testmode is disabled.');
-                    if (! $order->isCanceled()) {
-                        $order->registerCancellation("Order attempted paid with test card")->save();
+                    if (!$order->getId()) {
+                        $this->logger->debug('Failed to load order with id: ' . $response->order_id);
+                        return;
                     }
-                    return;
-                }
 
-                //Add transaction fee if set
-                if ($response->fee > 0) {
-                    $this->addTransactionFee($order, $response->fee);
-                }
+                    //Cancel order if testmode is disabled and this is a test payment
+                    $testMode = $this->scopeConfig->isSetFlag(self::TESTMODE_XML_PATH,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 
-                //Set order to processing
-                $stateProcessing = \Magento\Sales\Model\Order::STATE_PROCESSING;
+                    if (!$testMode && $response->test_mode === true) {
+                        $this->logger->debug('Order attempted paid with a test card but testmode is disabled.');
+                        if (!$order->isCanceled()) {
+                            $order->registerCancellation("Order attempted paid with test card")->save();
+                        }
+                        return;
+                    }
 
-                if ($order->getState() !== $stateProcessing) {
-                    $order->setState($stateProcessing)
-                        ->setStatus($order->getConfig()->getStateDefaultStatus($stateProcessing))
-                        ->save();
-                }
+                    //Add transaction fee if set
+                    if ($response->fee > 0) {
+                        $this->addTransactionFee($order, $response->fee);
+                    }
 
-                //Send order email
-                if (!$order->getEmailSent()) {
-                    $this->sendOrderConfirmation($order);
+                    //Set order to processing
+                    $stateProcessing = \Magento\Sales\Model\Order::STATE_PROCESSING;
+
+                    if ($order->getState() !== $stateProcessing) {
+                        $order->setState($stateProcessing)
+                            ->setStatus($order->getConfig()->getStateDefaultStatus($stateProcessing))
+                            ->save();
+                    }
+
+                    //Send order email
+                    if (!$order->getEmailSent()) {
+                        $this->sendOrderConfirmation($order);
+                    }
                 }
             } else {
                 $this->logger->debug('Checksum mismatch');

@@ -30,7 +30,7 @@ class CommandInterface
             $orderStatus = Order::STATE_NEW;
             if ($orderStatus && $order->getState() == Order::STATE_PROCESSING) {
                 $order->setState($orderStatus)
-                      ->setStatus($order->getConfig()->getStateDefaultStatus(\Magento\Sales\Model\Order::STATE_NEW));
+                      ->setStatus($order->getConfig()->getStateDefaultStatus(Order::STATE_NEW));
             }
         }
 
