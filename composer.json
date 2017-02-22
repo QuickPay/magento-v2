@@ -31,7 +31,7 @@
   ],
   "autoload": {
     "files": [
-      "registration.php"0
+      "registration.php"
     ],
     "psr-4": {
       "QuickPay\\Payment\\": ""
