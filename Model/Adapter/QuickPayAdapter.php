@@ -50,7 +50,7 @@ class QuickPayAdapter
      * Authorize payment and create payment link
      *
      * @param array $attributes
-     * @return boolean
+     * @return array|bool
      */
     public function authorizeAndCreatePaymentLink(array $attributes)
     {
