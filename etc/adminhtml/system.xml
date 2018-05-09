@@ -22,7 +22,7 @@
                     <source_model>QuickPay\Payment\Model\Adminhtml\Source\PaymentAction</source_model>
                 </field>
                 <field id="public_key" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Public Key</label>
+                    <label>API User Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
                 <field id="private_key" translate="label" type="obscure" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -56,15 +56,20 @@
                         <field id="*/*/payment_methods">specified</field>
                     </depends>
                 </field>
-                <field id="autocapture" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="text_on_statement" translate="label comment" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Text on statement</label>
+                    <comment><![CDATA[Text that will be placed on cardholder’s bank statement (MAX 22 ASCII characters and <strong>only supported by Clearhaus currently</strong>).<br>Has to start with Default descriptor, as described in your agreement with Clearhaus]]></comment>
+                    <validate>validate-length maximum-length-22</validate>
+                </field>
+                <field id="autocapture" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Autocapture</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="transaction_fee" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="transaction_fee" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Add Transaction Fee</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="transaction_fee_label" translate="label comment" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="transaction_fee_label" translate="label comment" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Transaction Fee Label</label>
                     <comment>This will appear on the customers invoice</comment>
                     <depends>

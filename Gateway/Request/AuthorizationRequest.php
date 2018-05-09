@@ -38,10 +38,14 @@ class AuthorizationRequest implements BuilderInterface
         $address = $order->getBillingAddress();
 
         return [
-            'INCREMENT_ID' => $order->getOrderIncrementId(),
-            'AMOUNT'       => $amount, //Get order total in cents
-            'CURRENCY'     => $order->getCurrencyCode(),
-            'EMAIL'        => $address->getEmail(),
+            'INCREMENT_ID'     => $order->getOrderIncrementId(),
+            'AMOUNT'           => $amount, //Get order total in cents
+            'ORDER_ID'         => $order->getId(),
+            'CURRENCY'         => $order->getCurrencyCode(),
+            'EMAIL'            => $address->getEmail(),
+            'BILLING_ADDRESS'  => $address,
+            'SHIPPING_ADDRESS' => $order->getShippingAddress(),
+            'ITEMS'            => $order->getItems(),
         ];
     }
 }
