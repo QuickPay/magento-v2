@@ -1,6 +1,6 @@
 <?php
 
-namespace QuickPay\Payment\Model\Config\Source;
+namespace QuickPay\Gateway\Model\Config\Source;
 
 class PaymentMethods implements \Magento\Framework\Option\ArrayInterface
 {

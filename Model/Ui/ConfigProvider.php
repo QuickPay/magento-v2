@@ -1,5 +1,5 @@
 <?php
-namespace QuickPay\Payment\Model\Ui;
+namespace QuickPay\Gateway\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 
@@ -8,7 +8,7 @@ use Magento\Checkout\Model\ConfigProviderInterface;
  */
 final class ConfigProvider implements ConfigProviderInterface
 {
-    const CODE = 'quickpay';
+    const CODE = 'quickpay_gateway';
 
     /**
      * Retrieve assoc array of checkout configuration
@@ -20,7 +20,7 @@ final class ConfigProvider implements ConfigProviderInterface
         return [
             'payment' => [
                 self::CODE => [
-                    'redirectUrl' => 'quickpay/payment/redirect',
+                    'redirectUrl' => 'quickpaygateway/payment/redirect',
                 ]
             ]
         ];

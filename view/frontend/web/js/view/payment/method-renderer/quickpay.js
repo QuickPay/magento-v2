@@ -1,13 +1,14 @@
 define(
     [
         'Magento_Checkout/js/view/payment/default',
-        'QuickPay_Payment/js/action/redirect-on-success'
+        'QuickPay_Gateway/js/action/redirect-on-success'
     ],
     function (Component, quickpayRedirect) {
         'use strict';
+
         return Component.extend({
             defaults: {
-                template: 'QuickPay_Payment/payment/form',
+                template: 'QuickPay_Gateway/payment/form',
                 paymentReady: false
             },
             redirectAfterPlaceOrder: false,
@@ -30,7 +31,7 @@ define(
             },
 
             getCode: function() {
-                return 'quickpay';
+                return 'quickpay_gateway';
             },
             getData: function() {
                 return {

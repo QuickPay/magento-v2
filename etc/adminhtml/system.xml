@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Copyright © 2016 Magento. All rights reserved.
+ * Copyright © 2019 Magento. All rights reserved.
  * See COPYING.txt for license details.
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
-            <group id="quickpay" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="quickpay_gateway" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>QuickPay</label>
                 <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled</label>
@@ -17,12 +17,8 @@
                 <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Title</label>
                 </field>
-                <field id="payment_action" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Payment Action</label>
-                    <source_model>QuickPay\Payment\Model\Adminhtml\Source\PaymentAction</source_model>
-                </field>
-                <field id="public_key" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>API User Key</label>
+                <field id="apikey" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>API key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
                 <field id="private_key" translate="label" type="obscure" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -33,6 +29,10 @@
                     <label>Testmode Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="order_status" translate="label" type="select" sortOrder="62" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>New Order Status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status\NewStatus</source_model>
+                </field>
                 <field id="allowspecific" translate="label" type="allowspecific" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment From Applicable Countries</label>
                     <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
@@ -41,29 +41,30 @@
                     <label>Payment From Specific Countries</label>
                     <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
                 </field>
-                <field id="sort_order" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Sort Order</label>
-                    <frontend_class>validate-number</frontend_class>
-                </field>
-                <field id="payment_methods" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="payment_methods" translate="label" type="select" sortOrder="82" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Methods</label>
-                    <source_model>QuickPay\Payment\Model\Config\Source\PaymentMethods</source_model>
+                    <source_model>QuickPay\Gateway\Model\Config\Source\PaymentMethods</source_model>
                 </field>
-                <field id="payment_method_specified" translate="label comment" type="text" sortOrder="105" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="payment_method_specified" translate="label comment" type="text" sortOrder="83" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Method</label>
                     <comment>Type in the cards you wish to accept (comma separated). See the valid payment types here: <![CDATA[<a href="http://tech.quickpay.net/appendixes/payment-methods/" target="_blank" rel="noopener">http://tech.quickpay.net/appendixes/payment-methods/</a>]]></comment>
                     <depends>
                         <field id="*/*/payment_methods">specified</field>
                     </depends>
                 </field>
+                <field id="autocapture" translate="label" type="select" sortOrder="83" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Autocapture</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="send_invoice_email" translate="label" type="select" sortOrder="86" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send Invoice Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Activating this setting will result in an email confirmation being sent when the payment is made and captured.</comment>
+                </field>
                 <field id="text_on_statement" translate="label comment" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Text on statement</label>
                     <comment><![CDATA[Text that will be placed on cardholder’s bank statement (MAX 22 ASCII characters and <strong>only supported by Clearhaus currently</strong>).<br>Has to start with Default descriptor, as described in your agreement with Clearhaus]]></comment>
                     <validate>validate-length maximum-length-22</validate>
-                </field>
-                <field id="autocapture" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Autocapture</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="transaction_fee" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Add Transaction Fee</label>
@@ -75,6 +76,10 @@
                     <depends>
                         <field id="*/*/transaction_fee">1</field>
                     </depends>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sort Order</label>
+                    <frontend_class>validate-number</frontend_class>
                 </field>
             </group>
         </section>

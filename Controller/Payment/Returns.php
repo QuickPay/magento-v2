@@ -1,8 +1,8 @@
 <?php
 
-namespace QuickPay\Payment\Controller\Payment;
+namespace QuickPay\Gateway\Controller\Payment;
 
-class ReturnAction extends \Magento\Framework\App\Action\Action
+class Returns extends \Magento\Framework\App\Action\Action
 {
     /**
      * @return \Magento\Checkout\Model\Session

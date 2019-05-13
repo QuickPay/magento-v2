@@ -1,19 +1,14 @@
-## QuickPay_Magento2
+## QuickPay_Gateway
 
-Module QuickPay\Payment implements integration with the QuickPay payment service provider.
+This is a major release - a remake of the old 2.x module (QuickPay_Payment).
 
-Currently in beta release, use at your own risk. Pull requests welcome!
+The main reason for the remake was to fix two main issues of QuickPay_Payment, namely:
+* Marking unsuccessful orders as "Authorized"
+* Making it not possible to cancel such orders
 
-Coded and tested in Magento 2.1.2, compatibility with other versions has not been tested yet.
+Currently in beta release, use at your own risk. We highly suggest to test it on a staging/development environment first.
 
-Implemented so far:
-* Authorize
-* Capture 
-* Partial Capture
-* Refund
-* Partial Refund
-* Cancel
-* Payment Fees
+Tested for Magento 2.0 / 2.1 / 2.2 / 2.3 (PHP version up to 7.2.11.)
 
 ### Installation
 ```

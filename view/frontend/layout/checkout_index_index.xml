@@ -17,10 +17,10 @@
                                                         <item name="renders" xsi:type="array">
                                                             <!-- merge payment method renders here -->
                                                             <item name="children" xsi:type="array">
-                                                                <item name="quickpay" xsi:type="array">
-                                                                    <item name="component" xsi:type="string">QuickPay_Payment/js/view/payment/quickpay</item>
+                                                                <item name="quickpay_gateway" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">QuickPay_Gateway/js/view/payment/quickpay</item>
                                                                     <item name="methods" xsi:type="array">
-                                                                        <item name="quickpay" xsi:type="array">
+                                                                        <item name="quickpay_gateway" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
                                                                     </item>

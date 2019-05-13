@@ -1,11 +1,14 @@
 <?php
-namespace QuickPay\Payment\Model\Adapter;
+namespace QuickPay\Gateway\Model\Adapter;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface;
 use Psr\Log\LoggerInterface;
-use \Magento\Framework\UrlInterface;
+use Magento\Framework\UrlInterface;
+use Magento\Sales\Api\TransactionRepositoryInterface;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use QuickPay\QuickPay;
 use Zend_Locale;
 
@@ -14,10 +17,12 @@ use Zend_Locale;
  */
 class QuickPayAdapter
 {
-    const PUBLIC_KEY_XML_PATH      = 'payment/quickpay/public_key';
-    const TRANSACTION_FEE_XML_PATH = 'payment/quickpay/transaction_fee';
-    const AUTOCAPTURE_XML_PATH = 'payment/quickpay/autocapture';
-    const TEXT_ON_STATEMENT_XML_PATH = 'payment/quickpay/text_on_statement';
+    const PUBLIC_KEY_XML_PATH      = 'payment/quickpay_gateway/apikey';
+    const TRANSACTION_FEE_XML_PATH = 'payment/quickpay_gateway/transaction_fee';
+    const AUTOCAPTURE_XML_PATH = 'payment/quickpay_gateway/autocapture';
+    const TEXT_ON_STATEMENT_XML_PATH = 'payment/quickpay_gateway/text_on_statement';
+    const PAYMENT_METHODS_XML_PATH = 'payment/quickpay_gateway/payment_methods';
+    const SPECIFIED_PAYMENT_METHOD_XML_PATH = 'payment/quickpay_gateway/payment_method_specified';
 
     /**
      * @var LoggerInterface
@@ -28,11 +33,6 @@ class QuickPayAdapter
      * @var \Magento\Framework\UrlInterface
      */
     protected $url;
-
-    /**
-     * @var \QuickPay\Payment\Helper\Data
-     */
-    protected $helper;
 
     /**
      * @var ResolverInterface
@@ -50,49 +50,76 @@ class QuickPayAdapter
     protected $orderRepository;
 
     /**
+     * @var \Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface
+     */
+    protected $transactionBuilder;
+
+    /**
+     * @var TransactionRepositoryInterface
+     */
+    protected $transactionRepository;
+
+    /**
+     * @var \Magento\Framework\App\Filesystem\DirectoryList
+     */
+    protected $dir;
+
+    /**
      * QuickPayAdapter constructor.
      *
      * @param LoggerInterface $logger
      * @param UrlInterface $url
-     * @param \QuickPay\Payment\Helper\Data $helper
      * @param ScopeConfigInterface $scopeConfig
      * @param ResolverInterface $resolver
      */
     public function __construct(
         LoggerInterface $logger,
         UrlInterface $url,
-        \QuickPay\Payment\Helper\Data $helper,
         ScopeConfigInterface $scopeConfig,
         ResolverInterface $resolver,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        BuilderInterface $transactionBuilder,
+        TransactionRepositoryInterface $transactionRepository,
+        DirectoryList $dir
     )
     {
         $this->logger = $logger;
         $this->url = $url;
-        $this->helper = $helper;
         $this->scopeConfig = $scopeConfig;
         $this->resolver = $resolver;
         $this->orderRepository = $orderRepository;
+        $this->transactionBuilder = $transactionBuilder;
+        $this->transactionRepository = $transactionRepository;
+        $this->dir = $dir;
+
+        $this->logger->pushHandler(new \Monolog\Handler\StreamHandler($this->dir->getRoot().'/var/log/quickpay.log'));
     }
 
     /**
-     * Authorize payment and create payment link
+     * create payment link
      *
      * @param array $attributes
      * @return array|bool
      */
-    public function authorizeAndCreatePaymentLink(array $attributes)
+    public function CreatePaymentLink($order)
     {
         try {
+            $response = [];
+            $this->logger->debug('CREATE PAYMENT');
+
             $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $client = new QuickPay(":{$api_key}");
 
             $form = [
-                'order_id' => $attributes['INCREMENT_ID'],
-                'currency' => $attributes['CURRENCY'],
+                'order_id' => $order->getIncrementId(),
+                'currency' => $order->getOrderCurrency()->ToString(),
             ];
 
-            $shippingAddress = $attributes['SHIPPING_ADDRESS'];
+            if ($textOnStatement = $this->scopeConfig->getValue(self::TEXT_ON_STATEMENT_XML_PATH)) {
+                $form['text_on_statement'] = $textOnStatement;
+            }
+
+            $shippingAddress = $order->getShippingAddress();
             $form['shipping_address'] = [];
             $form['shipping_address']['name'] = $shippingAddress->getFirstName() . " " . $shippingAddress->getLastName();
             $form['shipping_address']['street'] = $shippingAddress->getStreetLine1();
@@ -103,13 +130,11 @@ class QuickPayAdapter
             $form['shipping_address']['phone_number'] = $shippingAddress->getTelephone();
             $form['shipping_address']['email'] = $shippingAddress->getEmail();
 
-            $order = $this->orderRepository->get($attributes['ORDER_ID']);
-
             $form['shipping'] = [
                 'amount' => $order->getShippingInclTax() * 100
             ];
 
-            $billingAddress = $attributes['BILLING_ADDRESS'];
+            $billingAddress = $order->getShippingAddress();
             $form['invoice_address'] = [];
             $form['invoice_address']['name'] = $billingAddress->getFirstName() . " " . $billingAddress->getLastName();
             $form['invoice_address']['street'] = $billingAddress->getStreetLine1();
@@ -121,9 +146,8 @@ class QuickPayAdapter
             $form['invoice_address']['email'] = $billingAddress->getEmail();
 
             //Build basket array
-            $items = $attributes['ITEMS'];
             $form['basket'] = [];
-            foreach ($items as $item) {
+            foreach ($order->getAllVisibleItems() as $item) {
                 $form['basket'][] = [
                     'qty'        => (int) $item->getQtyOrdered(),
                     'item_no'    => $item->getSku(),
@@ -134,31 +158,46 @@ class QuickPayAdapter
             }
 
             $payments = $client->request->post('/payments', $form);
+
             $paymentArray = $payments->asArray();
+
+            $this->logger->debug(json_encode($paymentArray));
+
+            if(!empty($paymentArray['error_code'])){
+                $response['message'] = $paymentArray['message'];
+                return $response;
+            }
+
             $paymentId = $paymentArray['id'];
 
             $parameters = [
-                "amount"             => $attributes['AMOUNT'],
-                "continueurl"        => $this->url->getUrl('quickpay/payment/returnAction'),
-                "cancelurl"          => $this->url->getUrl('quickpay/payment/cancelAction'),
-                "callbackurl"        => $this->url->getUrl('quickpay/payment/callback'),
-                "customer_email"     => $attributes['EMAIL'],
+                "amount"             => $order->getTotalDue() * 100,
+                "continueurl"        => $this->url->getUrl('quickpaygateway/payment/returns'),
+                "cancelurl"          => $this->url->getUrl('quickpaygateway/payment/cancel'),
+                "callbackurl"        => $this->url->getUrl('quickpaygateway/payment/callback'),
+                "customer_email"     => $order->getCustomerEmail(),
                 "autocapture"        => $this->scopeConfig->isSetFlag(self::AUTOCAPTURE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
-                "payment_methods"    => $this->helper->getPaymentMethods(),
+                "payment_methods"    => $this->getPaymentMethods(),
                 "language"           => $this->getLanguage(),
                 "auto_fee"           => $this->scopeConfig->isSetFlag(self::TRANSACTION_FEE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
             ];
 
-            if ($textOnStatement = $this->scopeConfig->getValue(self::TEXT_ON_STATEMENT_XML_PATH)) {
-                $parameters['text_on_statement'] = $textOnStatement;
-            }
-
             //Create payment link and return payment id
             $paymentLink = $client->request->put(sprintf('/payments/%s/link', $paymentId), $parameters)->asArray();
-            $paymentArray['link'] = $paymentLink['url'];
 
-            return $paymentArray;
+            $this->logger->debug(json_encode($paymentLink));
+
+            if(!empty($paymentLink['error_code'])){
+                $response['message'] = $paymentLink['message'];
+
+                return $response;
+            }
+
+            $response['url'] = $paymentLink['url'];
+
+            return $response;
         } catch (\Exception $e) {
+
             $this->logger->critical($e->getMessage());
         }
 
@@ -171,21 +210,23 @@ class QuickPayAdapter
      * @param array $attributes
      * @return array|bool
      */
-    public function capture(array $attributes)
+    public function capture($transaction, $ammount)
     {
         try {
+            $this->logger->debug("Capture payment");
+
             $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $client = new QuickPay(":{$api_key}");
 
             $form = [
-                'id'     => $attributes['TXN_ID'],
-                'amount' => $attributes['AMOUNT'],
+                'id' => $transaction,
+                'amount' => $ammount * 100,
             ];
 
-            $id = $attributes['TXN_ID'];
-
-            $payments = $client->request->post("/payments/{$id}/capture", $form);
+            $payments = $client->request->post("/payments/{$transaction}/capture", $form);
             $paymentArray = $payments->asArray();
+
+            $this->logger->debug(json_encode($paymentArray));
 
             return $paymentArray;
         } catch (\Exception $e) {
@@ -201,7 +242,7 @@ class QuickPayAdapter
      * @param array $attributes
      * @return array|bool
      */
-    public function cancel(array $attributes)
+    public function cancel($transaction)
     {
         $this->logger->debug("Cancel payment");
         try {
@@ -209,17 +250,13 @@ class QuickPayAdapter
             $client = new QuickPay(":{$api_key}");
 
             $form = [
-                'id' => $attributes['TXN_ID'],
+                'id' => $transaction,
             ];
 
-            $this->logger->debug(var_export($form, true));
-
-            $id = $attributes['TXN_ID'];
-
-            $payments = $client->request->post("/payments/{$id}/cancel", $form);
+            $payments = $client->request->post("/payments/{$transaction}/cancel", $form);
             $paymentArray = $payments->asArray();
 
-            $this->logger->debug(var_export($paymentArray, true));
+            $this->logger->debug(json_encode($paymentArray));
 
             return $paymentArray;
         } catch (\Exception $e) {
@@ -235,7 +272,7 @@ class QuickPayAdapter
      * @param array $attributes
      * @return array|bool
      */
-    public function refund(array $attributes)
+    public function refund($transaction, $ammount)
     {
         $this->logger->debug("Refund payment");
 
@@ -244,18 +281,14 @@ class QuickPayAdapter
             $client = new QuickPay(":{$api_key}");
 
             $form = [
-                'id' => $attributes['TXN_ID'],
-                'amount' => $attributes['AMOUNT'],
+                'id' => $transaction,
+                'amount' => $ammount * 100,
             ];
 
-            $this->logger->debug(var_export($form, true));
-
-            $id = $attributes['TXN_ID'];
-
-            $payments = $client->request->post("/payments/{$id}/refund", $form);
+            $payments = $client->request->post("/payments/{$transaction}/refund", $form);
             $paymentArray = $payments->asArray();
 
-            $this->logger->debug(var_export($paymentArray, true));
+            $this->logger->debug(json_encode($paymentArray));
 
             return $paymentArray;
         } catch (\Exception $e) {
@@ -287,5 +320,82 @@ class QuickPayAdapter
         }
 
         return $language;
+    }
+
+    /**
+     * Get payment methods
+     *
+     * @return string
+     */
+    public function getPaymentMethods()
+    {
+        $payment_methods = $this->scopeConfig->getValue(self::PAYMENT_METHODS_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+
+        /**
+         * Get specified payment methods
+         */
+        if ($payment_methods === 'specified') {
+            $payment_methods = $this->scopeConfig->getValue(self::SPECIFIED_PAYMENT_METHOD_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+
+        return $payment_methods;
+    }
+
+    /**
+     * @param null $order
+     * @param $transactionId
+     * @param $type
+     */
+    public function createTransaction($order = null, $transactionId, $type)
+    {
+        try {
+            //get payment object from order object
+            $payment = $order->getPayment();
+
+            $formatedPrice = $order->getBaseCurrency()->formatTxt(
+                $order->getGrandTotal()
+            );
+
+            $message = '';
+            if($type == \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH){
+                $message = __('The authorized amount is %1.', $formatedPrice);
+            } elseif($type == \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE) {
+                $message = __('The captured amount is %1.', $formatedPrice);
+            }
+
+            if($payment->getLastTransId()){
+                $parent_id = $payment->getLastTransId();
+            } else {
+                $parent_id = null;
+            }
+
+            $payment->setLastTransId($transactionId);
+            $payment->setTransactionId($transactionId);
+            /*$payment->setAdditionalInformation(
+                [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS => (array) $paymentData]
+            );*/
+
+            //get the object of builder class
+            $trans = $this->transactionBuilder;
+            $transaction = $trans->setPayment($payment)
+                ->setOrder($order)
+                ->setTransactionId($transactionId)
+                ->setAdditionalInformation(
+                    [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS => (array)$payment->getAdditionalInformation()]
+                )
+                ->setFailSafe(true)
+                //build method creates the transaction and returns the object
+                ->build($type);
+            $payment->addTransactionCommentsToOrder(
+                $transaction,
+                $message
+            );
+            $payment->setParentTransactionId($parent_id);
+            $payment->save();
+            $order->save();
+
+        } catch (Exception $e) {
+            //log errors here
+        }
     }
 }

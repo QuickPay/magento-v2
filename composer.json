@@ -3,8 +3,8 @@
   "description": "Implements integration with the QuickPay payment service provider.",
   "authors": [
     {
-      "name": "Rasmus Bech",
-      "email": "me@rbech.com"
+      "name": "Codemakers",
+      "email": "domas@codemakers.dk"
     }
   ],
   "require": {
@@ -21,7 +21,7 @@
       "registration.php"
     ],
     "psr-4": {
-      "QuickPay\\Payment\\": ""
+      "QuickPay\\Gateway\\": ""
     }
   }
 }

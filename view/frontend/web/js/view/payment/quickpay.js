@@ -10,10 +10,11 @@ define(
         'use strict';
         rendererList.push(
             {
-                type: 'quickpay',
-                component: 'QuickPay_Payment/js/view/payment/method-renderer/quickpay'
+                type: 'quickpay_gateway',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/quickpay'
             }
         );
+
         return Component.extend({});
     }
 );
