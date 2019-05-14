@@ -23,5 +23,6 @@
     "psr-4": {
       "QuickPay\\Gateway\\": ""
     }
-  }
+  },
+  "minimum-stability": "dev"
 }
