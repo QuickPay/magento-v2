@@ -1,5 +1,5 @@
 {
-  "name": "quickpay/magento2",
+  "name": "quickpay/magento2-remake",
   "description": "Implements integration with the QuickPay payment service provider.",
   "authors": [
     {
