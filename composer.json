@@ -1,5 +1,5 @@
 {
-  "name": "gquickpay/magento2:dev-QuickPay_Gateway-remake",
+  "name": "gquickpay/magento2:QuickPay_Gateway-remake",
   "description": "Implements integration with the QuickPay payment service provider.",
   "authors": [
     {
