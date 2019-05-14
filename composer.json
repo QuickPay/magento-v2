@@ -1,5 +1,5 @@
 {
-  "name": "gquickpay/magento2:QuickPay_Gateway-remake",
+  "name": "gquickpay/magento2",
   "description": "Implements integration with the QuickPay payment service provider.",
   "authors": [
     {
@@ -24,5 +24,12 @@
       "QuickPay\\Gateway\\": ""
     }
   },
-  "minimum-stability": "dev"
+  "version": "1.0.0",
+  "minimum-stability": "stable",
+  "repositories": [
+    {
+      "type": "path",
+      "url": "https://github.com/QuickPay/magento-v2.git"
+    }
+  ],
 }
