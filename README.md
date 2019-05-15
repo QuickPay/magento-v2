@@ -12,8 +12,9 @@ Tested for Magento 2.0 / 2.1 / 2.2 / 2.3 (PHP version up to 7.2.11.)
 
 ### Installation
 ```
-composer require quickpay/magento2
-php bin/magento module:enable QuickPay_Payment
+composer config repositories.repo-name vcs https://github.com/QuickPay/magento-v2.git
+composer require quickpay/magento2:dev-QuickPay_Gateway-remake
+php bin/magento module:enable QuickPay_Gateway
 php bin/magento setup:upgrade
 php bin/magento setup:di:compile
 ``` 
