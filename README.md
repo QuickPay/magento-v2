@@ -16,6 +16,7 @@ composer config repositories.repo-name vcs https://github.com/QuickPay/magento-v
 composer require quickpay/magento2:dev-QuickPay_Gateway-remake
 php bin/magento module:enable QuickPay_Gateway
 php bin/magento setup:upgrade
+php bin/magento setup:static-content:deploy
 php bin/magento setup:di:compile
 ``` 
 
