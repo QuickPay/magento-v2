@@ -5,7 +5,7 @@ namespace QuickPay\Gateway\Controller\Payment;
 use Magento\Sales\Model\Order;
 use Zend\Json\Json;
 
-class Callback extends \Magento\Framework\App\Action\Action implements CsrfAwareActionInterface
+class Callback extends \Magento\Framework\App\Action\Action
 {
     const PRIVATE_KEY_XML_PATH            = 'payment/quickpay_gateway/private_key';
     const TESTMODE_XML_PATH               = 'payment/quickpay_gateway/testmode';
