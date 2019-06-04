@@ -175,14 +175,18 @@ class Callback extends \Magento\Framework\App\Action\Action implements CsrfAware
                         $payment->setCcExpMonth($response->metadata->exp_month);
                         $payment->setCcExpYear($response->metadata->exp_year);
 
-                        $payment->setAdditionalInformation('cc_number', 'xxxx-' . $response->metadata->last4);
-                        $payment->setAdditionalInformation('exp_month', $response->metadata->exp_month);
-                        $payment->setAdditionalInformation('exp_year', $response->metadata->exp_year);
-                        $payment->setAdditionalInformation('cc_type', $response->metadata->brand);
+                        $payment->setAdditionalInformation('Transaction ID', $response->id);
+                        $payment->setAdditionalInformation('Type', $response->metadata->type);
+                        $payment->setAdditionalInformation('Card Type', $response->metadata->brand);
+                        $payment->setAdditionalInformation('Card Number', 'XXXX-' . $response->metadata->last4);
+                        $payment->setAdditionalInformation('Card Expiration Date', date('Y-m', strtotime($response->metadata->exp_year.'-'.$response->metadata->exp_month)));
+                        $payment->setAdditionalInformation('Currency', $response->currency);
+
                     } else {
                         if (isset($response->metadata->payment_method)) {
                             $payment->setCcType($response->metadata->payment_method);
-                            $payment->setAdditionalInformation('cc_type', $response->metadata->payment_method);
+                            $payment->setAdditionalInformation('Transaction ID', $response->id);
+                            $payment->setAdditionalInformation('Type', $response->metadata->payment_method);
                         }
                     }
 
