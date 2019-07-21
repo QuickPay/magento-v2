@@ -137,7 +137,7 @@ class QuickPayAdapter
             $billingAddress = $order->getShippingAddress();
             $form['invoice_address'] = [];
             $form['invoice_address']['name'] = $billingAddress->getFirstName() . " " . $billingAddress->getLastName();
-            $form['invoice_address']['street'] = $billingAddress->getStreetLine1();
+            $form['invoice_address']['street'] = implode(' ', $billingAddress->getStreet());
             $form['invoice_address']['city'] = $billingAddress->getCity();
             $form['invoice_address']['zip_code'] = $billingAddress->getPostcode();
             $form['invoice_address']['region'] = $billingAddress->getRegionCode();
