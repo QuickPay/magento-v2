@@ -23,6 +23,7 @@ class QuickPayAdapter
     const TEXT_ON_STATEMENT_XML_PATH = 'payment/quickpay_gateway/text_on_statement';
     const PAYMENT_METHODS_XML_PATH = 'payment/quickpay_gateway/payment_methods';
     const SPECIFIED_PAYMENT_METHOD_XML_PATH = 'payment/quickpay_gateway/payment_method_specified';
+    const BRANDING_ID_XML_PATH = 'payment/quickpay_gateway/branding_id';
 
     /**
      * @var LoggerInterface
@@ -178,6 +179,7 @@ class QuickPayAdapter
                 "customer_email"     => $order->getCustomerEmail(),
                 "autocapture"        => $this->scopeConfig->isSetFlag(self::AUTOCAPTURE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
                 "payment_methods"    => $this->getPaymentMethods(),
+                "branding_id"        => $this->scopeConfig->getValue(self::BRANDING_ID_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
                 "language"           => $this->getLanguage(),
                 "auto_fee"           => $this->scopeConfig->isSetFlag(self::TRANSACTION_FEE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
             ];

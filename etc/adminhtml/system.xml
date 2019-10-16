@@ -25,6 +25,9 @@
                     <label>Private Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
+                <field id="branding_id" translate="label" type="text" sortOrder="51" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Branding ID</label>
+                </field>
                 <field id="testmode" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Testmode Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
