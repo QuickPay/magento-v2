@@ -6,7 +6,7 @@ The main reason for the remake was to fix two main issues of QuickPay_Payment, n
 * Marking unsuccessful orders as "Authorized"
 * Making it not possible to cancel such orders
 
-Currently in beta release, use at your own risk. We highly suggest to test it on a staging/development environment first.
+We highly suggest to test it on a staging/development environment first.
 
 Tested for Magento 2.0 / 2.1 / 2.2 / 2.3 (PHP version up to 7.2.11.)
 

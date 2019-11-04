@@ -6,6 +6,7 @@ use Magento\Framework\Event\Observer;
 
 class SalesOrderPaymentPlaceStart implements \Magento\Framework\Event\ObserverInterface
 {
+    const SEND_ORDER_EMAIL_XML_PATH     = 'payment/quickpay_gateway/send_order_email';
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
@@ -32,11 +33,19 @@ class SalesOrderPaymentPlaceStart implements \Magento\Framework\Event\ObserverIn
         $payment = $observer->getPayment();
 
         if ($payment->getMethod() === \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE) {
-            /** @var \Magento\Sales\Model\Order $order */
+            $emailSend = $this->scopeConfig->getValue(self::SEND_ORDER_EMAIL_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $order = $payment->getOrder();
-            $order->setCanSendNewEmailFlag(true)
-                ->setIsCustomerNotified(true)
-                ->save();
+            if($emailSend) {
+                /** @var \Magento\Sales\Model\Order $order */
+                $order->setCanSendNewEmailFlag(true)
+                    ->setIsCustomerNotified(true)
+                    ->save();
+            } else {
+                /** @var \Magento\Sales\Model\Order $order */
+                $order->setCanSendNewEmailFlag(false)
+                    ->setIsCustomerNotified(false)
+                    ->save();
+            }
         }
     }
 }

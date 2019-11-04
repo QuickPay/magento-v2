@@ -59,6 +59,11 @@
                     <label>Autocapture</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="send_order_email" translate="label" type="select" sortOrder="86" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send Order Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Activating this setting will result in an email confirmation being sent before payment.</comment>
+                </field>
                 <field id="send_invoice_email" translate="label" type="select" sortOrder="86" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Send Invoice Email</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
