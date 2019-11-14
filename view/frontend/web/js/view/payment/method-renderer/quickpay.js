@@ -40,7 +40,10 @@ define(
             },
             afterPlaceOrder: function() {
                 quickpayRedirect.execute();
-            }
+            },
+            getPaymentLogo: function () {
+                return window.checkoutConfig.payment.quickpay_gateway.paymentLogo;
+            },
         });
     }
 );

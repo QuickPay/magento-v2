@@ -44,6 +44,10 @@
                     <label>Payment From Specific Countries</label>
                     <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
                 </field>
+                <field id="cardlogos" translate="label" type="multiselect" sortOrder="81" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Which card logos should be displayed</label>
+                    <source_model>QuickPay\Gateway\Model\Config\Source\PaymentLogo</source_model>
+                </field>
                 <field id="payment_methods" translate="label" type="select" sortOrder="82" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Methods</label>
                     <source_model>QuickPay\Gateway\Model\Config\Source\PaymentMethods</source_model>
