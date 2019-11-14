@@ -19,7 +19,6 @@
                 <cardtype>0</cardtype>
                 <sendmailorderconfirmation>1</sendmailorderconfirmation>
                 <sendmailorderconfirmationbefore>0</sendmailorderconfirmationbefore>
-                <cardlogos>dankort,visa,mastercard,maestro</cardlogos>
                 <handlestock>1</handlestock>
                 <allowspecific>0</allowspecific>
                 <autocapture>0</autocapture>

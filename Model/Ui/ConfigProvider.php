@@ -49,7 +49,9 @@ final class ConfigProvider implements ConfigProviderInterface
 
         if(count($cards)) {
             foreach ($cards as $card) {
-                $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/logo/{$card}.png");
+                if($card) {
+                    $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/logo/{$card}.png");
+                }
             }
         }
 

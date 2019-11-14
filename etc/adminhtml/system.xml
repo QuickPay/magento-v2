@@ -46,6 +46,7 @@
                 </field>
                 <field id="cardlogos" translate="label" type="multiselect" sortOrder="81" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Which card logos should be displayed</label>
+                    <can_be_empty>1</can_be_empty>
                     <source_model>QuickPay\Gateway\Model\Config\Source\PaymentLogo</source_model>
                 </field>
                 <field id="payment_methods" translate="label" type="select" sortOrder="82" showInDefault="1" showInWebsite="1" showInStore="1">
