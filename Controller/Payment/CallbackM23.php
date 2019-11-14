@@ -229,9 +229,9 @@ class Callback extends \Magento\Framework\App\Action\Action implements CsrfAware
                     }
 
                     //Send order email
-                    /*if (!$order->getEmailSent()) {
+                    if (!$order->getEmailSent()) {
                         $this->sendOrderConfirmation($order);
-                    }*/
+                    }
                 }
             } else {
                 $this->logger->debug('Checksum mismatch');
