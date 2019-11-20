@@ -67,12 +67,12 @@
                 <field id="send_order_email" translate="label" type="select" sortOrder="86" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Send Order Email</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Activating this setting will result in an email confirmation being sent before payment.</comment>
+                    <comment>Activating this setting will result in an email confirmation being sent before payment is authorized. If not active, then mail will be sent after payment is authorized</comment>
                 </field>
                 <field id="send_invoice_email" translate="label" type="select" sortOrder="86" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Send Invoice Email</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Activating this setting will result in an email confirmation being sent when the payment is made and captured.</comment>
+                    <comment>Activating this setting will result in an email confirmation being sent when invoice is created</comment>
                 </field>
                 <field id="text_on_statement" translate="label comment" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Text on statement</label>
