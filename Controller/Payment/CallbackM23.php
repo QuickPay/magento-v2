@@ -63,6 +63,11 @@ class Callback extends \Magento\Framework\App\Action\Action implements CsrfAware
     protected $dir;
 
     /**
+     * @var \QuickPay\Gateway\Helper\Order
+     */
+    protected $orderHelper;
+
+    /**
      * Class constructor
      * @param \Magento\Framework\App\Action\Context              $context
      * @param \Psr\Log\LoggerInterface                           $logger
@@ -78,7 +83,8 @@ class Callback extends \Magento\Framework\App\Action\Action implements CsrfAware
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
         \Magento\Framework\DB\TransactionFactory $transactionFactory,
         \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender,
-        \Magento\Framework\App\Filesystem\DirectoryList $dir
+        \Magento\Framework\App\Filesystem\DirectoryList $dir,
+        \QuickPay\Gateway\Helper\Order $orderHelper
     )
     {
         $this->scopeConfig = $scopeConfig;
@@ -90,6 +96,7 @@ class Callback extends \Magento\Framework\App\Action\Action implements CsrfAware
         $this->invoiceService = $invoiceService;
         $this->transactionFactory = $transactionFactory;
         $this->invoiceSender = $invoiceSender;
+        $this->orderHelper = $orderHelper;
 
         $this->logger->pushHandler(new \Monolog\Handler\StreamHandler($this->dir->getRoot().'/var/log/quickpay.log'));
 
@@ -143,7 +150,22 @@ class Callback extends \Magento\Framework\App\Action\Action implements CsrfAware
                      * Load order by incrementId
                      * @var Order $order
                      */
+
                     $order = $this->order->loadByIncrementId($response->order_id);
+
+                    if($order->getId()){
+                        if($order->getState() == \Magento\Sales\Model\Order::STATE_PROCESSING){
+                            return;
+                        }
+                    }
+
+                    if($response->facilitator == 'mobilepay'){
+                        $order = $this->orderHelper->updateOrderByCallback($order, $response);
+
+                        $order->addStatusHistoryComment(__('Order was created from MobilePay Checkout'))
+                            ->setIsCustomerNotified(true)
+                            ->save();
+                    }
 
                     if (!$order->getId()) {
                         $this->logger->debug('Failed to load order with id: ' . $response->order_id);
@@ -232,6 +254,8 @@ class Callback extends \Magento\Framework\App\Action\Action implements CsrfAware
                     if (!$order->getEmailSent()) {
                         $this->sendOrderConfirmation($order);
                     }
+
+                    echo "OK";
                 }
             } else {
                 $this->logger->debug('Checksum mismatch');

@@ -1,0 +1,156 @@
+<div class="mobilepay-wrapper">
+    <h2><?php echo $block->getTitle() ?></h2>
+    <p><?php echo $block->getDescription() ?></p>
+
+    <a href="#" type="button" class="btn btn-primary btn-lg" id="MobilePayButton" data-toggle="modal" data-target="#MobilePayModal">
+        <img src="<?php echo $this->getViewFileUrl('QuickPay_Gateway::images/mobilepay.png'); ?>" />
+    </a>
+    <!-- Modal -->
+    <div class="modal fade" id="MobilePayModal" role="dialog" style="display:none;">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <?php $methods = $block->getShippingMethods() ?>
+                    <form id="mobilepay-form" action="<?php echo $block->getRedirectUrl() ?>" method="post">
+                        <div class="select-shipping field required">
+                            <?php if($block->getPopupDescription()) : ?>
+                            <p><?php echo $block->getPopupDescription(); ?></p>
+                            <?php endif; ?>
+                            <label><?php echo __('Vælg forsendelsesmetode') ?>:</label>
+                            <select name="shipping" class="input-text" data-validate="{required:true}">
+                                <option value="">---</option>
+                            <?php foreach($methods as $code => $method) : ?>
+                                <option value="<?php echo $code; ?>"><?php echo $method['title'] ?> ( +<?php echo $method['price'] ?> )</option>
+                            <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="field required">
+                            <ol id="checkout-agreements" class="agreements checkout items">
+                                <?php /** @var \Magento\CheckoutAgreements\Api\Data\AgreementInterface $agreement */ ?>
+                                <?php foreach ($block->getAgreements() as $agreement): ?>
+                                    <li class="item">
+                                        <div style="display:none;" data-toggle="modal" id="MobilePayAgreement-<?php echo $agreement->getAgreementId() ?>" role="dialog" class="modal fade checkout-agreement-item-content"<?= $block->escapeHtmlAttr($agreement->getContentHeight() ? ' style="height:' . $agreement->getContentHeight() . '"' : '') ?>>
+                                            <?php if ($agreement->getIsHtml()) :?>
+                                                <?= /* @noEscape */ $agreement->getContent() ?>
+                                            <?php else :?>
+                                                <?= $block->escapeHtml(nl2br($agreement->getContent())) ?>
+                                            <?php endif; ?>
+                                        </div>
+                                        <form id="mobilepay-agreements-form-<?= /* @escapeNotVerified */ $agreement->getAgreementId() ?>" class="field choice agree required">
+                                            <?php if($agreement->getMode() == \Magento\CheckoutAgreements\Model\AgreementModeOptions::MODE_MANUAL): ?>
+                                                <input type="checkbox"
+                                                       id="mobilepay-agreement-<?= /* @escapeNotVerified */ $agreement->getAgreementId() ?>"
+                                                       name="agreement[<?= /* @escapeNotVerified */ $agreement->getAgreementId() ?>]"
+                                                       value="1"
+                                                       title="<?= $block->escapeHtml($agreement->getCheckboxText()) ?>"
+                                                       class="checkbox agreement"
+                                                       data-validate="{required:true}" />
+                                                <a href="#" class="label agreement-show" data-target="MobilePayAgreement-<?php echo $agreement->getAgreementId() ?>">
+                                                    <span><?= $agreement->getIsHtml() ? $agreement->getCheckboxText() : $block->escapeHtml($agreement->getCheckboxText()) ?></span>
+                                                </a>
+                                            <?php elseif($agreement->getMode() == \Magento\CheckoutAgreements\Model\AgreementModeOptions::MODE_AUTO): ?>
+                                                <div id="mobilepay-agreements-form-<?= /* @escapeNotVerified */ $agreement->getAgreementId() ?>" class="field choice agree">
+                                                    <span><?= $agreement->getIsHtml() ? $agreement->getCheckboxText() : $block->escapeHtml($agreement->getCheckboxText()) ?></span>
+                                                </div>
+                                            <?php endif; ?>
+                                        </form>
+                                    </li>
+                                <?php endforeach ?>
+                            </ol>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        require(
+            [
+                'jquery',
+                'Magento_Ui/js/modal/modal'
+            ],
+            function(
+                $,
+                modal
+            ) {
+                var options = {
+                    type: 'popup',
+                    responsive: true,
+                    innerScroll: true,
+                    buttons: [{
+                        text: $.mage.__('Place Order Now'),
+                        class: 'action primary checkout mobilepay-place-btn',
+                        click: function () {
+                            var dataForm = $('#mobilepay-form');
+                            var obj = this;
+                            dataForm.submit();
+
+                            if ($("input.agreement").hasClass("mage-error")) {
+                                $('.agreement-show').addClass('error');
+                            } else {
+                                $('.agreement-show').removeClass('error');
+                            }
+
+                            if ($('#mobilepay-form').valid()) {
+                                $('.mobilepay-place-btn').prop('disabled', true);
+                                jQuery.ajax({
+                                    url: dataForm.attr('action'),
+                                    type: 'POST',
+                                    data: dataForm.serialize(),
+                                    dataType: 'json',
+                                    success: function (data) {
+                                        if (data.error) {
+                                            alert(data.error);
+                                        } else {
+                                            obj.closeModal();
+                                            window.location.replace(data.url);
+                                        }
+                                        $('.mobilepay-place-btn').prop('disabled', false);
+                                    },
+                                    error: function (result) {
+                                    }
+                                });
+                            }
+                        }
+                    }]
+                };
+                var options2 = {
+                    type: 'popup',
+                    responsive: true,
+                    innerScroll: true,
+                    buttons: [{
+                        text: $.mage.__('Close'),
+                        class: 'action primary',
+                        click: function () {
+                            this.closeModal();
+                        }
+                    }]
+                };
+
+                var popup = modal(options, $('#MobilePayModal'));
+                $("#MobilePayButton").on('click',function(){
+                    $("#MobilePayModal").modal("openModal");
+                });
+
+                $(".agreement-show").on('click',function(){
+                    var target = $(this).data("target");
+                    var popup = modal(options2, $('#'+target));
+                    $('#'+target).modal("openModal");
+
+                    return false;
+                });
+
+                $(document).on('submit','#mobilepay-form',function(){
+                    return false;
+                })
+            });
+    </script>
+    <script type="text/x-magento-init">
+    {
+        "#mobilepay-form": {
+            "validation": {}
+        }
+    }
+</script>
+</div>

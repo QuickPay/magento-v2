@@ -2,3 +2,22 @@
     height: 25px;
     margin-left: 5px;
 }
+.mobilepay-wrapper {
+    margin-bottom: 40px;
+}
+#mobilepay-form .agreement-show.error {
+    color: red;
+}
+#mobilepay-form .select-shipping {
+    margin-bottom: 15px;
+}
+#mobilepay-form .select-shipping label {
+    margin-bottom: 5px;
+    display: block;
+}
+.modal-popup._show .modal-inner-wrap {
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    margin: auto;
+    top:50%;
+}

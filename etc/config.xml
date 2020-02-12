@@ -32,7 +32,24 @@
                 <can_refund>1</can_refund>
                 <apikey backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <shipping_store_pick_up_title>Hent i butikken</shipping_store_pick_up_title>
+                <shipping_home_delivery_title>Ordren leveres til din hjemmeadresse</shipping_home_delivery_title>
+                <shipping_registered_box_title>Afhentning i en pakkeshop (registered_box)</shipping_registered_box_title>
+                <shipping_unregistered_box_title>Afhentning i en pakkeshop (unregistered_box)</shipping_unregistered_box_title>
+                <shipping_pick_up_point_title>Afhentning i en pakkeshop (pick_up_point)</shipping_pick_up_point_title>
+                <shipping_own_delivery_title>Ordren leveres til din hjemmeadresse</shipping_own_delivery_title>
             </quickpay_gateway>
         </payment>
+        <carriers>
+            <mobilepay>
+                <active>1</active>
+                <sallowspecific>0</sallowspecific>
+                <model>QuickPay\Gateway\Model\Carrier\Shipping</model>
+                <name>QuickPay</name>
+                <price>0.00</price>
+                <title>MobilePay Checkout</title>
+                <handling_type>F</handling_type>
+            </mobilepay>
+        </carriers>
     </default>
 </config>
