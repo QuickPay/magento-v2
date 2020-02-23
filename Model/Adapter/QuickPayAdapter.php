@@ -122,21 +122,23 @@ class QuickPayAdapter
             }
 
             $shippingAddress = $order->getShippingAddress();
-            $form['shipping_address'] = [];
-            $form['shipping_address']['name'] = $shippingAddress->getFirstName() . " " . $shippingAddress->getLastName();
-            $form['shipping_address']['street'] = $shippingAddress->getStreetLine1();
-            $form['shipping_address']['city'] = $shippingAddress->getCity();
-            $form['shipping_address']['zip_code'] = $shippingAddress->getPostcode();
-            $form['shipping_address']['region'] = $shippingAddress->getRegionCode();
-            $form['shipping_address']['country_code'] = Zend_Locale::getTranslation($shippingAddress->getCountryId(), 'Alpha3ToTerritory');
-            $form['shipping_address']['phone_number'] = $shippingAddress->getTelephone();
-            $form['shipping_address']['email'] = $shippingAddress->getEmail();
+            if($shippingAddress) {
+                $form['shipping_address'] = [];
+                $form['shipping_address']['name'] = $shippingAddress->getFirstName() . " " . $shippingAddress->getLastName();
+                $form['shipping_address']['street'] = $shippingAddress->getStreetLine1();
+                $form['shipping_address']['city'] = $shippingAddress->getCity();
+                $form['shipping_address']['zip_code'] = $shippingAddress->getPostcode();
+                $form['shipping_address']['region'] = $shippingAddress->getRegionCode();
+                $form['shipping_address']['country_code'] = Zend_Locale::getTranslation($shippingAddress->getCountryId(), 'Alpha3ToTerritory');
+                $form['shipping_address']['phone_number'] = $shippingAddress->getTelephone();
+                $form['shipping_address']['email'] = $shippingAddress->getEmail();
+            }
 
             $form['shipping'] = [
                 'amount' => $order->getShippingInclTax() * 100
             ];
 
-            $billingAddress = $order->getShippingAddress();
+            $billingAddress = $order->getBillingAddress();
             $form['invoice_address'] = [];
             $form['invoice_address']['name'] = $billingAddress->getFirstName() . " " . $billingAddress->getLastName();
             $form['invoice_address']['street'] = implode(' ', $billingAddress->getStreet());
