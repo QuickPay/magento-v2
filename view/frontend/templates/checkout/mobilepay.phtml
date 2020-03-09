@@ -13,6 +13,7 @@
                 <div class="modal-body">
                     <?php $methods = $block->getShippingMethods() ?>
                     <form id="mobilepay-form" action="<?php echo $block->getRedirectUrl() ?>" method="post">
+                        <input type="hidden" name="mobilepay" value="1" />
                         <div class="select-shipping field required">
                             <?php if($block->getPopupDescription()) : ?>
                             <p><?php echo $block->getPopupDescription(); ?></p>

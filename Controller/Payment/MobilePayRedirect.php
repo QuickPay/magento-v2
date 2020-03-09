@@ -92,9 +92,6 @@ class MobilePayRedirect extends \Magento\Framework\App\Action\Action
             if(empty($params['shipping'])){
                 $response['error'] = __('Please select shipping method');
                 return $resultJson->setData($response);
-            } elseif(empty($params['agreement'])){
-                $response['error'] = __('Please agree with the terms and conditions');
-                return $resultJson->setData($response);
             }
 
             $shippingData = $this->shipping->getMethodByCode($params['shipping']);

@@ -33,6 +33,13 @@ class Shipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
     protected $_currencyInterface;
 
     /**
+     * Request instance
+     *
+     * @var \Magento\Framework\App\RequestInterface
+     */
+    protected $request;
+
+    /**
      * Shipping constructor.
      *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface          $scopeConfig
@@ -49,12 +56,14 @@ class Shipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
         \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
         \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
         \Magento\Framework\Pricing\PriceCurrencyInterface $currencyInterface,
+        \Magento\Framework\App\RequestInterface $request,
         array $data = []
     ) {
         $this->_rateResultFactory = $rateResultFactory;
         $this->_rateMethodFactory = $rateMethodFactory;
         $this->_scopeConfig = $scopeConfig;
         $this->_currencyInterface = $currencyInterface;
+        $this->request = $request;
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
     }
 
@@ -93,6 +102,10 @@ class Shipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
     public function collectRates(RateRequest $request)
     {
         if (!$this->getConfigFlag('active')) {
+            return false;
+        }
+
+        if(!$this->_scopeConfig->getValue('payment/quickpay_gateway/mobilepay/active', \Magento\Store\Model\ScopeInterface::SCOPE_STORE) || !$this->request->getParam('mobilepay')){
             return false;
         }
 
