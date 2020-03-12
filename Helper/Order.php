@@ -262,35 +262,39 @@ class Order extends AbstractHelper
 
         $billingName = $this->splitCustomerName($billingAddress->name);
         $billingStreet = [$billingAddress->street, $billingAddress->house_number];
-        $quote->getBillingAddress()->addData(
-            [
-                'firstname' => $billingName['firstname'],
-                'lastname' => $billingName['lastname'],
-                'street' => implode(' ',$billingStreet),
-                'city' => $billingAddress->city ? $billingAddress->city : '-',
-                'country_id' => $billingAddress->country_code ? $billingAddress->country_code : 'DK',
-                'region' => $billingAddress->region,
-                'postcode' => $billingAddress->zip_code ? $billingAddress->zip_code : '-',
-                'telephone' => $billingAddress->phone_number ? $billingAddress->phone_number : '-',
-                'vat_id' => $billingAddress->vat_no,
-                'save_in_address_book' => 0
-            ]
-        );
+        if($quote->getBillingAddress()){
+            $quote->getBillingAddress()->addData(
+                [
+                    'firstname' => $billingName['firstname'],
+                    'lastname' => $billingName['lastname'],
+                    'street' => implode(' ',$billingStreet),
+                    'city' => $billingAddress->city ? $billingAddress->city : '-',
+                    'country_id' => $billingAddress->country_code ? $billingAddress->country_code : 'DK',
+                    'region' => $billingAddress->region,
+                    'postcode' => $billingAddress->zip_code ? $billingAddress->zip_code : '-',
+                    'telephone' => $billingAddress->phone_number ? $billingAddress->phone_number : '-',
+                    'vat_id' => $billingAddress->vat_no,
+                    'save_in_address_book' => 0
+                ]
+            );
+        }
 
         $shippingName = $this->splitCustomerName($shippingAddress->name);
         $shippingStreet = [$shippingAddress->street, $shippingAddress->house_number];
-        $quote->getShippingAddress()->addData([
-            'firstname' => $shippingName['firstname'],
-            'lastname' => $shippingName['lastname'],
-            'street' => implode(' ',$shippingStreet),
-            'city' => $shippingAddress->city ? $shippingAddress->city : '-',
-            'country_id' => $shippingAddress->country_code ? $shippingAddress->country_code : 'DK',
-            'region' => $shippingAddress->region,
-            'postcode' => $shippingAddress->zip_code ? $shippingAddress->zip_code : '-',
-            'telephone' => $shippingAddress->phone_number ? $shippingAddress->phone_number : '-',
-            'vat_id' => $shippingAddress->vat_no,
-            'save_in_address_book' => 0
-        ]);
+        if($quote->getShippingAddress()){
+            $quote->getShippingAddress()->addData([
+                'firstname' => $shippingName['firstname'],
+                'lastname' => $shippingName['lastname'],
+                'street' => implode(' ',$shippingStreet),
+                'city' => $shippingAddress->city ? $shippingAddress->city : '-',
+                'country_id' => $shippingAddress->country_code ? $shippingAddress->country_code : 'DK',
+                'region' => $shippingAddress->region,
+                'postcode' => $shippingAddress->zip_code ? $shippingAddress->zip_code : '-',
+                'telephone' => $shippingAddress->phone_number ? $shippingAddress->phone_number : '-',
+                'vat_id' => $shippingAddress->vat_no,
+                'save_in_address_book' => 0
+            ]);
+        }
 
 
         // Set Sales Order Payment
