@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Module\ResourceInterface;
 use QuickPay\QuickPay;
 use Zend_Locale;
 
@@ -67,6 +68,11 @@ class QuickPayAdapter
     protected $dir;
 
     /**
+     * @var \Magento\Framework\Module\ResourceInterface
+     */
+    protected $moduleResource;
+
+    /**
      * QuickPayAdapter constructor.
      *
      * @param LoggerInterface $logger
@@ -82,6 +88,7 @@ class QuickPayAdapter
         OrderRepositoryInterface $orderRepository,
         BuilderInterface $transactionBuilder,
         TransactionRepositoryInterface $transactionRepository,
+        ResourceInterface $moduleResource,
         DirectoryList $dir
     )
     {
@@ -92,6 +99,7 @@ class QuickPayAdapter
         $this->orderRepository = $orderRepository;
         $this->transactionBuilder = $transactionBuilder;
         $this->transactionRepository = $transactionRepository;
+        $this->moduleResource = $moduleResource;
         $this->dir = $dir;
 
         $this->logger->pushHandler(new \Monolog\Handler\StreamHandler($this->dir->getRoot().'/var/log/quickpay.log'));
@@ -148,6 +156,10 @@ class QuickPayAdapter
             $form['invoice_address']['country_code'] = Zend_Locale::getTranslation($billingAddress->getCountryId(), 'Alpha3ToTerritory');
             $form['invoice_address']['phone_number'] = $billingAddress->getTelephone();
             $form['invoice_address']['email'] = $billingAddress->getEmail();
+
+            $form['shopsystem'] = [];
+            $form['shopsystem']['name'] = 'Magento 2';
+            $form['shopsystem']['version'] = $this->moduleResource->getDbVersion('QuickPay_Gateway');
 
             //Build basket array
             $form['basket'] = [];
@@ -231,6 +243,10 @@ class QuickPayAdapter
             if ($textOnStatement = $this->scopeConfig->getValue(self::TEXT_ON_STATEMENT_XML_PATH)) {
                 $form['text_on_statement'] = $textOnStatement;
             }
+
+            $form['shopsystem'] = [];
+            $form['shopsystem']['name'] = 'Magento 2';
+            $form['shopsystem']['version'] = $this->moduleResource->getDbVersion('QuickPay_Gateway');
 
             //Build basket array
             $form['basket'] = [];
