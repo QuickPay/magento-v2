@@ -133,7 +133,7 @@ class QuickPayAdapter
             if($shippingAddress) {
                 $form['shipping_address'] = [];
                 $form['shipping_address']['name'] = $shippingAddress->getFirstName() . " " . $shippingAddress->getLastName();
-                $form['shipping_address']['street'] = $shippingAddress->getStreetLine1();
+                $form['shipping_address']['street'] = $shippingAddress->getStreetLine(1);
                 $form['shipping_address']['city'] = $shippingAddress->getCity();
                 $form['shipping_address']['zip_code'] = $shippingAddress->getPostcode();
                 $form['shipping_address']['region'] = $shippingAddress->getRegionCode();
