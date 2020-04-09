@@ -3,9 +3,15 @@
 namespace QuickPay\Gateway\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Store\Model\ScopeInterface;
 
 class Order extends AbstractHelper
 {
+    /**
+     * Get country path
+     */
+    const CONFIG_COUNTRY_CODE_PATH = 'general/country/default';
+
     /**
      * @var \Psr\Log\LoggerInterface
      */
@@ -119,12 +125,13 @@ class Order extends AbstractHelper
         }
 
         $defaultValue = 'DNK';
+        $countryCode = $this->getCountryByWebsite();
         $defaultAddress = [
             'firstname' => $defaultValue,
             'lastname' => $defaultValue,
             'street' => $defaultValue,
             'city' => $defaultValue,
-            'country_id' => 'DK',
+            'country_id' => $countryCode,
             'region' => $defaultValue,
             'postcode' => $defaultValue,
             'telephone' => $defaultValue,
@@ -193,13 +200,14 @@ class Order extends AbstractHelper
 
         $billingName = $this->splitCustomerName($billingAddress->name);
         $billingStreet = [$billingAddress->street, $billingAddress->house_number];
+        $countryCode = $this->convertCountryAlphas3To2($billingAddress->country_code);
         $order->getBillingAddress()->addData(
             [
                 'firstname' => $billingName['firstname'],
                 'lastname' => $billingName['lastname'],
                 'street' => implode(' ',$billingStreet),
                 'city' => $billingAddress->city ? $billingAddress->city : '-',
-                'country_id' => $billingAddress->country_code ? $billingAddress->country_code : 'DK',
+                'country_id' => $countryCode,
                 'region' => $billingAddress->region,
                 'postcode' => $billingAddress->zip_code ? $billingAddress->zip_code : '-',
                 'telephone' => $billingAddress->phone_number ? $billingAddress->phone_number : '-',
@@ -210,12 +218,13 @@ class Order extends AbstractHelper
 
         $shippingName = $this->splitCustomerName($shippingAddress->name);
         $shippingStreet = [$shippingAddress->street, $shippingAddress->house_number];
+        $countryCode = $this->convertCountryAlphas3To2($shippingAddress->country_code);
         $order->getShippingAddress()->addData([
             'firstname' => $shippingName['firstname'],
             'lastname' => $shippingName['lastname'],
             'street' => implode(' ',$shippingStreet),
             'city' => $shippingAddress->city ? $shippingAddress->city : '-',
-            'country_id' => $shippingAddress->country_code ? $shippingAddress->country_code : 'DK',
+            'country_id' => $countryCode,
             'region' => $shippingAddress->region,
             'postcode' => $shippingAddress->zip_code ? $shippingAddress->zip_code : '-',
             'telephone' => $shippingAddress->phone_number ? $shippingAddress->phone_number : '-',
@@ -262,39 +271,35 @@ class Order extends AbstractHelper
 
         $billingName = $this->splitCustomerName($billingAddress->name);
         $billingStreet = [$billingAddress->street, $billingAddress->house_number];
-        if($quote->getBillingAddress()){
-            $quote->getBillingAddress()->addData(
-                [
-                    'firstname' => $billingName['firstname'],
-                    'lastname' => $billingName['lastname'],
-                    'street' => implode(' ',$billingStreet),
-                    'city' => $billingAddress->city ? $billingAddress->city : '-',
-                    'country_id' => $billingAddress->country_code ? $billingAddress->country_code : 'DK',
-                    'region' => $billingAddress->region,
-                    'postcode' => $billingAddress->zip_code ? $billingAddress->zip_code : '-',
-                    'telephone' => $billingAddress->phone_number ? $billingAddress->phone_number : '-',
-                    'vat_id' => $billingAddress->vat_no,
-                    'save_in_address_book' => 0
-                ]
-            );
-        }
+        $quote->getBillingAddress()->addData(
+            [
+                'firstname' => $billingName['firstname'],
+                'lastname' => $billingName['lastname'],
+                'street' => implode(' ',$billingStreet),
+                'city' => $billingAddress->city ? $billingAddress->city : '-',
+                'country_id' => $billingAddress->country_code ? $billingAddress->country_code : 'DK',
+                'region' => $billingAddress->region,
+                'postcode' => $billingAddress->zip_code ? $billingAddress->zip_code : '-',
+                'telephone' => $billingAddress->phone_number ? $billingAddress->phone_number : '-',
+                'vat_id' => $billingAddress->vat_no,
+                'save_in_address_book' => 0
+            ]
+        );
 
         $shippingName = $this->splitCustomerName($shippingAddress->name);
         $shippingStreet = [$shippingAddress->street, $shippingAddress->house_number];
-        if($quote->getShippingAddress()){
-            $quote->getShippingAddress()->addData([
-                'firstname' => $shippingName['firstname'],
-                'lastname' => $shippingName['lastname'],
-                'street' => implode(' ',$shippingStreet),
-                'city' => $shippingAddress->city ? $shippingAddress->city : '-',
-                'country_id' => $shippingAddress->country_code ? $shippingAddress->country_code : 'DK',
-                'region' => $shippingAddress->region,
-                'postcode' => $shippingAddress->zip_code ? $shippingAddress->zip_code : '-',
-                'telephone' => $shippingAddress->phone_number ? $shippingAddress->phone_number : '-',
-                'vat_id' => $shippingAddress->vat_no,
-                'save_in_address_book' => 0
-            ]);
-        }
+        $quote->getShippingAddress()->addData([
+            'firstname' => $shippingName['firstname'],
+            'lastname' => $shippingName['lastname'],
+            'street' => implode(' ',$shippingStreet),
+            'city' => $shippingAddress->city ? $shippingAddress->city : '-',
+            'country_id' => $shippingAddress->country_code ? $shippingAddress->country_code : 'DK',
+            'region' => $shippingAddress->region,
+            'postcode' => $shippingAddress->zip_code ? $shippingAddress->zip_code : '-',
+            'telephone' => $shippingAddress->phone_number ? $shippingAddress->phone_number : '-',
+            'vat_id' => $shippingAddress->vat_no,
+            'save_in_address_book' => 0
+        ]);
 
 
         // Set Sales Order Payment
@@ -311,5 +316,33 @@ class Order extends AbstractHelper
         }
 
         return $order;
+    }
+
+    /**
+     * Get Country code by website scope
+     *
+     * @return string
+     */
+    public function getCountryByWebsite(): string
+    {
+        return $this->scopeConfig->getValue(
+            self::CONFIG_COUNTRY_CODE_PATH,
+            ScopeInterface::SCOPE_WEBSITES
+        );
+    }
+
+    /**
+     * @param string $code
+     * @return mixed
+     */
+    public function convertCountryAlphas3To2($code = 'DK') {
+        $countries = json_decode('{"AFG":"AF","ALA":"AX","ALB":"AL","DZA":"DZ","ASM":"AS","AND":"AD","AGO":"AO","AIA":"AI","ATA":"AQ","ATG":"AG","ARG":"AR","ARM":"AM","ABW":"AW","AUS":"AU","AUT":"AT","AZE":"AZ","BHS":"BS","BHR":"BH","BGD":"BD","BRB":"BB","BLR":"BY","BEL":"BE","BLZ":"BZ","BEN":"BJ","BMU":"BM","BTN":"BT","BOL":"BO","BIH":"BA","BWA":"BW","BVT":"BV","BRA":"BR","VGB":"VG","IOT":"IO","BRN":"BN","BGR":"BG","BFA":"BF","BDI":"BI","KHM":"KH","CMR":"CM","CAN":"CA","CPV":"CV","CYM":"KY","CAF":"CF","TCD":"TD","CHL":"CL","CHN":"CN","HKG":"HK","MAC":"MO","CXR":"CX","CCK":"CC","COL":"CO","COM":"KM","COG":"CG","COD":"CD","COK":"CK","CRI":"CR","CIV":"CI","HRV":"HR","CUB":"CU","CYP":"CY","CZE":"CZ","DNK":"DK","DKK":"DK","DJI":"DJ","DMA":"DM","DOM":"DO","ECU":"EC","Sal":"El","GNQ":"GQ","ERI":"ER","EST":"EE","ETH":"ET","FLK":"FK","FRO":"FO","FJI":"FJ","FIN":"FI","FRA":"FR","GUF":"GF","PYF":"PF","ATF":"TF","GAB":"GA","GMB":"GM","GEO":"GE","DEU":"DE","GHA":"GH","GIB":"GI","GRC":"GR","GRL":"GL","GRD":"GD","GLP":"GP","GUM":"GU","GTM":"GT","GGY":"GG","GIN":"GN","GNB":"GW","GUY":"GY","HTI":"HT","HMD":"HM","VAT":"VA","HND":"HN","HUN":"HU","ISL":"IS","IND":"IN","IDN":"ID","IRN":"IR","IRQ":"IQ","IRL":"IE","IMN":"IM","ISR":"IL","ITA":"IT","JAM":"JM","JPN":"JP","JEY":"JE","JOR":"JO","KAZ":"KZ","KEN":"KE","KIR":"KI","PRK":"KP","KOR":"KR","KWT":"KW","KGZ":"KG","LAO":"LA","LVA":"LV","LBN":"LB","LSO":"LS","LBR":"LR","LBY":"LY","LIE":"LI","LTU":"LT","LUX":"LU","MKD":"MK","MDG":"MG","MWI":"MW","MYS":"MY","MDV":"MV","MLI":"ML","MLT":"MT","MHL":"MH","MTQ":"MQ","MRT":"MR","MUS":"MU","MYT":"YT","MEX":"MX","FSM":"FM","MDA":"MD","MCO":"MC","MNG":"MN","MNE":"ME","MSR":"MS","MAR":"MA","MOZ":"MZ","MMR":"MM","NAM":"NA","NRU":"NR","NPL":"NP","NLD":"NL","ANT":"AN","NCL":"NC","NZL":"NZ","NIC":"NI","NER":"NE","NGA":"NG","NIU":"NU","NFK":"NF","MNP":"MP","NOR":"NO","OMN":"OM","PAK":"PK","PLW":"PW","PSE":"PS","PAN":"PA","PNG":"PG","PRY":"PY","PER":"PE","PHL":"PH","PCN":"PN","POL":"PL","PRT":"PT","PRI":"PR","QAT":"QA","REU":"RE","ROU":"RO","RUS":"RU","RWA":"RW","BLM":"BL","SHN":"SH","KNA":"KN","LCA":"LC","MAF":"MF","SPM":"PM","VCT":"VC","WSM":"WS","SMR":"SM","STP":"ST","SAU":"SA","SEN":"SN","SRB":"RS","SYC":"SC","SLE":"SL","SGP":"SG","SVK":"SK","SVN":"SI","SLB":"SB","SOM":"SO","ZAF":"ZA","SGS":"GS","SSD":"SS","ESP":"ES","LKA":"LK","SDN":"SD","SUR":"SR","SJM":"SJ","SWZ":"SZ","SWE":"SE","CHE":"CH","SYR":"SY","TWN":"TW","TJK":"TJ","TZA":"TZ","THA":"TH","TLS":"TL","TGO":"TG","TKL":"TK","TON":"TO","TTO":"TT","TUN":"TN","TUR":"TR","TKM":"TM","TCA":"TC","TUV":"TV","UGA":"UG","UKR":"UA","ARE":"AE","GBR":"GB","USA":"US","UMI":"UM","URY":"UY","UZB":"UZ","VUT":"VU","VEN":"VE","VNM":"VN","VIR":"VI","WLF":"WF","ESH":"EH","YEM":"YE","ZMB":"ZM","ZWE":"ZW","GBP":"GB","RUB":"RU","NOK":"NO"}',true);
+
+        if(!isset($countries[$code])){
+            $defaultCountry = $this->getCountryByWebsite();
+            return $defaultCountry;
+        } else {
+            return $countries[$code];
+        }
     }
 }
