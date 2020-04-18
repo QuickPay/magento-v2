@@ -20,6 +20,16 @@ class Redirect extends \Magento\Framework\App\Action\Action
     protected $_adapter;
 
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $_checkoutSession;
+
+    /**
+     * @var \Magento\Sales\Model\OrderFactory
+     */
+    protected $_orderFactory;
+
+    /**
      * Class constructor
      * @param \Magento\Framework\App\Action\Context              $context
      * @param \Psr\Log\LoggerInterface                           $logger
@@ -28,12 +38,16 @@ class Redirect extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Action\Context $context,
         \Psr\Log\LoggerInterface $logger,
         \Magento\Sales\Api\Data\OrderInterface $orderRepository,
-        \QuickPay\Gateway\Model\Adapter\QuickPayAdapter $adapter
+        \QuickPay\Gateway\Model\Adapter\QuickPayAdapter $adapter,
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Sales\Model\OrderFactory $orderFactory
     )
     {
         $this->_logger = $logger;
         $this->orderRepository = $orderRepository;
         $this->_adapter = $adapter;
+        $this->_checkoutSession = $checkoutSession;
+        $this->_orderFactory = $orderFactory;
 
         parent::__construct($context);
     }
@@ -43,7 +57,19 @@ class Redirect extends \Magento\Framework\App\Action\Action
      */
     protected function _getCheckout()
     {
-        return $this->_objectManager->get('Magento\Checkout\Model\Session');
+        return $this->_checkoutSession;
+    }
+
+    /**
+     * @return bool|\Magento\Sales\Model\Order
+     */
+    public function getOrder()
+    {
+        if ($this->_getCheckout()->getLastRealOrderId()) {
+            $order = $this->_orderFactory->create()->loadByIncrementId($this->_getCheckout()->getLastRealOrderId());
+            return $order;
+        }
+        return false;
     }
 
     /**
@@ -54,20 +80,25 @@ class Redirect extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         try {
+            $order = $this->getOrder();
 
-            $order = $this->_getCheckout()->getLastRealOrder();
+            if($order) {
+                //Save quote id in session for retrieval later
+                $this->_getCheckout()->setQuickpayQuoteId($this->_getCheckout()->getQuoteId());
 
-            //Save quote id in session for retrieval later
-            $this->_getCheckout()->setQuickpayQuoteId($this->_getCheckout()->getQuoteId());
+                $response = $this->_adapter->CreatePaymentLink($order);
 
-            $response = $this->_adapter->CreatePaymentLink($order);
-
-            if(isset($response['message'])){
-                $this->messageManager->addError($response['message']);
+                if (isset($response['message'])) {
+                    $this->messageManager->addError($response['message']);
+                    $this->_getCheckout()->restoreQuote();
+                    $this->_redirect($this->_redirect->getRefererUrl());
+                } else {
+                    $this->_redirect($response['url']);
+                }
+            } else {
+                $this->messageManager->addError('Error');
                 $this->_getCheckout()->restoreQuote();
                 $this->_redirect($this->_redirect->getRefererUrl());
-            } else {
-                $this->_redirect($response['url']);
             }
         } catch (\Exception $e) {
             $this->messageManager->addException($e, __('Something went wrong, please try again later'));
