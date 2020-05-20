@@ -51,6 +51,20 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     protected $_canUseForMultishipping  = false;
 
     /**
+     * Payment Method feature
+     *
+     * @var bool
+     */
+    protected $_canCapturePartial = true;
+
+    /**
+     * Payment Method feature
+     *
+     * @var bool
+     */
+    protected $_canRefundInvoicePartial = true;
+
+    /**
      * @param $lan
      * @return mixed
      */
