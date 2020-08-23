@@ -6,4 +6,10 @@
     <event name="sales_order_invoice_pay">
         <observer name="quickpay_capture_after_invoice" instance="QuickPay\Gateway\Observer\CaptureOrderInvoiceAfter" />
     </event>
+    <event name="order_cancel_after">
+        <observer name="quickpay_order_cancel_after" instance="QuickPay\Gateway\Observer\CancelOrderAfter" />
+    </event>
+    <event name="checkout_submit_all_after">
+        <observer name="quickpay_send_payment_email" instance="QuickPay\Gateway\Observer\SendPaymentEmail" />
+    </event>
 </config>

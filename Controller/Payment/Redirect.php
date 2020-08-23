@@ -93,6 +93,17 @@ class Redirect extends \Magento\Framework\App\Action\Action
                     $this->_getCheckout()->restoreQuote();
                     $this->_redirect($this->_redirect->getRefererUrl());
                 } else {
+                    //SAVE PAYMENT URL
+                    $payment = $order->getPayment();
+                    $additional = $payment->getAdditionalData();
+                    if(!$additional){
+                        $additional = [];
+                    }
+                    $additional['payment_link'] = $response['url'];
+
+                    $payment->setAdditionalData(json_encode($additional));
+                    $payment->save();
+
                     $this->_redirect($response['url']);
                 }
             } else {

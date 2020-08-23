@@ -19,6 +19,11 @@ class Returns extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
+        $area = $this->getRequest()->getParam('area');
+        if($area == 'admin'){
+            $this->messageManager->addSuccess(__('Thank you for your purchase. You will soon receive a confirmation by email.'));
+        }
+
         if ($this->_getCheckout()->getLastRealOrderId()) {
             $this->_redirect('checkout/onepage/success');
         }

@@ -1,0 +1,4 @@
+<?php $order = $block->getOrder(); ?>
+<?php if($order->getState() == 'new' && $block->getPaymentLink()) : ?>
+    <a href="<?= $block->getPaymentLink() ?>" target="_blank"><?= __('Payment Link') ?></a>
+<?php endif; ?>

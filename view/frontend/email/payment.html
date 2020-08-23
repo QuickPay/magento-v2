@@ -1,0 +1,14 @@
+<!--@subject Payment link for # {{var order.increment_id}} @-->
+{{template config_path="design/email/header_template"}}
+
+<table cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td class="action-content">
+            <h1>Betaling for ordre {{var order.increment_id}}</h1>
+            <p>En ny ordre er blevet oprettet til dig</p>
+            <p><a href="{{var paymentlink}}">Klik her for at betale for den</a>.</p>
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

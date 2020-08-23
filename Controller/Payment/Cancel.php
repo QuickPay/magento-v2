@@ -19,6 +19,11 @@ class Cancel extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
+        $area = $this->getRequest()->getParam('area');
+        if($area == 'admin'){
+            $this->messageManager->addSuccess(__('Your order has been canceled.'));
+        }
+
         $order = $this->_getCheckout()->getLastRealOrder();
         if ($order->getId() && ! $order->isCanceled()) {
             $order->registerCancellation('')->save();

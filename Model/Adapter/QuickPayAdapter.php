@@ -111,7 +111,7 @@ class QuickPayAdapter
      * @param array $attributes
      * @return array|bool
      */
-    public function CreatePaymentLink($order)
+    public function CreatePaymentLink($order, $area = 'frontend')
     {
         try {
             $response = [];
@@ -199,6 +199,12 @@ class QuickPayAdapter
                 "auto_fee"           => $this->scopeConfig->isSetFlag(self::TRANSACTION_FEE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
                 "testmode"           => $this->scopeConfig->isSetFlag(self::TEST_MODE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
             ];
+
+            if($area == 'adminhtml'){
+                $parameters['continueurl'] = $this->url->getBaseUrl().'quickpaygateway/payment/returns?area=admin';
+                $parameters['cancelurl'] = $this->url->getBaseUrl().'quickpaygateway/payment/cancel?area=admin';
+                $parameters['callbackurl'] = $this->url->getBaseUrl().'quickpaygateway/payment/callback';
+            }
 
             //Create payment link and return payment id
             $paymentLink = $client->request->put(sprintf('/payments/%s/link', $paymentId), $parameters)->asArray();
