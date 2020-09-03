@@ -32,13 +32,34 @@
                 <can_refund>1</can_refund>
                 <apikey backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
-                <shipping_store_pick_up_title>Hent i butikken</shipping_store_pick_up_title>
-                <shipping_home_delivery_title>Ordren leveres til din hjemmeadresse</shipping_home_delivery_title>
-                <shipping_registered_box_title>Afhentning i en pakkeshop (registered_box)</shipping_registered_box_title>
-                <shipping_unregistered_box_title>Afhentning i en pakkeshop (unregistered_box)</shipping_unregistered_box_title>
-                <shipping_pick_up_point_title>Afhentning i en pakkeshop (pick_up_point)</shipping_pick_up_point_title>
-                <shipping_own_delivery_title>Ordren leveres til din hjemmeadresse</shipping_own_delivery_title>
+                <mobilepay>
+                    <title>QuickPay MobilePay</title>
+                    <active>0</active>
+                    <shipping_store_pick_up_title>Hent i butikken</shipping_store_pick_up_title>
+                    <shipping_home_delivery_title>Ordren leveres til din hjemmeadresse</shipping_home_delivery_title>
+                    <shipping_registered_box_title>Afhentning i en pakkeshop (registered_box)</shipping_registered_box_title>
+                    <shipping_unregistered_box_title>Afhentning i en pakkeshop (unregistered_box)</shipping_unregistered_box_title>
+                    <shipping_pick_up_point_title>Afhentning i en pakkeshop (pick_up_point)</shipping_pick_up_point_title>
+                    <shipping_own_delivery_title>Ordren leveres til din hjemmeadresse</shipping_own_delivery_title>
+                </mobilepay>
             </quickpay_gateway>
+            <quickpay_klarna>
+                <model>QuickPay\Gateway\Model\Klarna</model>
+                <title>QuickPay Klarna</title>
+                <active>0</active>
+                <order_status>pending_payment</order_status>
+                <handlestock>1</handlestock>
+                <allowspecific>0</allowspecific>
+                <autocapture>0</autocapture>
+                <transactionfee>0</transactionfee>
+                <specifytransactionfee>0</specifytransactionfee>
+                <can_use_checkout>1</can_use_checkout>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_void>1</can_void>
+                <can_cancel>1</can_cancel>
+                <can_refund>1</can_refund>
+            </quickpay_klarna>
         </payment>
         <carriers>
             <mobilepay>

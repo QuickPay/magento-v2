@@ -9,6 +9,7 @@ use Magento\Checkout\Model\ConfigProviderInterface;
 final class ConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'quickpay_gateway';
+    const CODE_KLARNA = 'quickpay_klarna';
 
     const XML_PATH_CARD_LOGO = 'payment/quickpay_gateway/cardlogos';
 
@@ -35,13 +36,16 @@ final class ConfigProvider implements ConfigProviderInterface
             'payment' => [
                 self::CODE => [
                     'redirectUrl' => 'quickpaygateway/payment/redirect',
-                    'paymentLogo' => $this->getCardLogo()
+                    'paymentLogo' => $this->getQuickPayCardLogo()
+                ],
+                self::CODE_KLARNA => [
+                    'paymentLogo' => $this->getKlarnaLogo()
                 ]
             ]
         ];
     }
 
-    public function getCardLogo(){
+    public function getQuickPayCardLogo(){
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $cards = explode(',', $this->scopeConfig->getValue(self::XML_PATH_CARD_LOGO, $storeScope));
 
@@ -54,6 +58,14 @@ final class ConfigProvider implements ConfigProviderInterface
                 }
             }
         }
+
+        return $items;
+    }
+
+    public function getKlarnaLogo(){
+        $items = [];
+
+        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/klarna.png");
 
         return $items;
     }

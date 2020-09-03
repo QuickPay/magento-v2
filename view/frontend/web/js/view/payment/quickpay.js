@@ -12,6 +12,10 @@ define(
             {
                 type: 'quickpay_gateway',
                 component: 'QuickPay_Gateway/js/view/payment/method-renderer/quickpay'
+            },
+            {
+                type: 'quickpay_klarna',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/klarna'
             }
         );
 

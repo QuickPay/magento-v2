@@ -186,6 +186,12 @@ class QuickPayAdapter
 
             $paymentId = $paymentArray['id'];
 
+            if($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_KLARNA){
+                $paymentMethods = 'klarna-payments';
+            } else {
+                $paymentMethods = $this->getPaymentMethods();
+            }
+
             $parameters = [
                 "amount"             => $order->getTotalDue() * 100,
                 "continueurl"        => $this->url->getUrl('quickpaygateway/payment/returns'),
@@ -193,7 +199,7 @@ class QuickPayAdapter
                 "callbackurl"        => $this->url->getUrl('quickpaygateway/payment/callback'),
                 "customer_email"     => $order->getCustomerEmail(),
                 "autocapture"        => $this->scopeConfig->isSetFlag(self::AUTOCAPTURE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
-                "payment_methods"    => $this->getPaymentMethods(),
+                "payment_methods"    => $paymentMethods,
                 "branding_id"        => $this->scopeConfig->getValue(self::BRANDING_ID_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
                 "language"           => $this->getLanguage(),
                 "auto_fee"           => $this->scopeConfig->isSetFlag(self::TRANSACTION_FEE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
