@@ -209,6 +209,10 @@ class Callback extends \Magento\Framework\App\Action\Action implements CsrfAware
                             $payment->setCcType($response->metadata->payment_method);
                             $payment->setAdditionalInformation('Transaction ID', $response->id);
                             $payment->setAdditionalInformation('Type', $response->metadata->payment_method);
+                        } elseif (isset($response->acquirer) && $response->acquirer) {
+                            $payment->setCcType($response->acquirer);
+                            $payment->setAdditionalInformation('Transaction ID', $response->id);
+                            $payment->setAdditionalInformation('Type', $response->acquirer);
                         }
                     }
 
