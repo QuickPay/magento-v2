@@ -27,9 +27,10 @@ class CaptureOrderShipmentAfter implements ObserverInterface
         $payment = $order->getPayment();
         if ($payment->getMethod() === \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE) {
             $parts = explode('-', $payment->getLastTransId());
+            $order = $payment->getOrder();
             $transaction = $parts[0];
 
-            $this->adapter->capture($transaction, $order->getGrandTotal());
+            $this->adapter->capture($order,$transaction, $order->getGrandTotal());
         }
     }
 }

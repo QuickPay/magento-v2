@@ -28,9 +28,10 @@ class CancelOrderAfter implements ObserverInterface
         $payment = $order->getPayment();
         if ($payment->getMethod() === \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE) {
             $parts = explode('-', $payment->getLastTransId());
+            $order = $payment->getOrder();
             $transaction = $parts[0];
 
-            $this->adapter->cancel($transaction);
+            $this->adapter->cancel($order, $transaction);
         }
     }
 }
