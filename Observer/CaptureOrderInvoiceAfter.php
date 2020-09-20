@@ -31,7 +31,7 @@ class CaptureOrderInvoiceAfter implements ObserverInterface
             $parts = explode('-', $payment->getLastTransId());
             $transaction = $parts[0];
 
-            $this->adapter->capture($transaction, $order->getGrandTotal());
+            $this->adapter->capture($order, $transaction, $order->getGrandTotal());
         }
     }
 }

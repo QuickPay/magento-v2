@@ -336,12 +336,12 @@ class QuickPayAdapter
      * @param array $attributes
      * @return array|bool
      */
-    public function capture($transaction, $ammount)
+    public function capture($order, $transaction, $ammount)
     {
         try {
             $this->logger->debug("Capture payment");
 
-            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
             $client = new QuickPay(":{$api_key}");
 
             $form = [
@@ -368,11 +368,11 @@ class QuickPayAdapter
      * @param array $attributes
      * @return array|bool
      */
-    public function cancel($transaction)
+    public function cancel($order, $transaction)
     {
         $this->logger->debug("Cancel payment");
         try {
-            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
             $client = new QuickPay(":{$api_key}");
 
             $form = [
@@ -398,12 +398,12 @@ class QuickPayAdapter
      * @param array $attributes
      * @return array|bool
      */
-    public function refund($transaction, $ammount)
+    public function refund($order, $transaction, $ammount)
     {
         $this->logger->debug("Refund payment");
 
         try {
-            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
             $client = new QuickPay(":{$api_key}");
 
             $form = [
