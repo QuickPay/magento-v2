@@ -1,6 +1,6 @@
 {
   "name": "quickpay/magento2",
-  "description": "Implements integration with the QuickPay payment service provider.",
+  "description": "Implements integration with the QuickPay payment service provider",
   "authors": [
     {
       "name": "Codemakers",
@@ -12,7 +12,6 @@
     "quickpay/quickpay-php-client": "1.0.*"
   },
   "type": "magento2-module",
-  "version": "2.0.4",
   "license": [
     "OSL-3.0",
     "AFL-3.0"
