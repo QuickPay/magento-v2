@@ -20,3 +20,5 @@ php bin/magento setup:di:compile
 ``` 
 
 **Please note that FTP installation will not work as this module has requirements that will be auto installed when using composer**
+
+Pull requests welcome.
