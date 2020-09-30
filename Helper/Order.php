@@ -80,8 +80,12 @@ class Order extends AbstractHelper
     {
         $connection = $this->resource->getConnection('core_read');
 
-        $table = $this->resource->getTableName('quote');
-        $quoteId = $connection->fetchOne('SELECT entity_id FROM ' . $table . ' WHERE reserved_order_id = "'.$orderId.'"');
+        $select = $connection->select()->from(
+            $this->resource->getTableName('quote'),
+            ['entity_id']
+        )->where('reserved_order_id = ?', $orderId);
+
+        $quoteId = $connection->fetchOne($select);
 
         return $this->quoteRepository->get($quoteId);
     }
