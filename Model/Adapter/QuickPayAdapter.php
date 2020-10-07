@@ -140,6 +140,9 @@ class QuickPayAdapter
                 $form['shipping_address']['country_code'] = Zend_Locale::getTranslation($shippingAddress->getCountryId(), 'Alpha3ToTerritory');
                 $form['shipping_address']['phone_number'] = $shippingAddress->getTelephone();
                 $form['shipping_address']['email'] = $shippingAddress->getEmail();
+                $form['shipping_address']['house_number'] = '';
+                $form['shipping_address']['house_extension'] = '';
+                $form['shipping_address']['mobile_number'] = '';
             }
 
             $form['shipping'] = [
@@ -156,6 +159,9 @@ class QuickPayAdapter
             $form['invoice_address']['country_code'] = Zend_Locale::getTranslation($billingAddress->getCountryId(), 'Alpha3ToTerritory');
             $form['invoice_address']['phone_number'] = $billingAddress->getTelephone();
             $form['invoice_address']['email'] = $billingAddress->getEmail();
+            $form['invoice_address']['house_number'] = '';
+            $form['invoice_address']['house_extension'] = '';
+            $form['invoice_address']['mobile_number'] = '';
 
             $form['shopsystem'] = [];
             $form['shopsystem']['name'] = 'Magento 2';
@@ -517,6 +523,12 @@ class QuickPayAdapter
                 $message
             );
             $payment->setParentTransactionId($parent_id);
+
+            // update totals
+            $amount = $order->getGrandTotal();
+            $amount = $payment->formatAmount($amount, true);
+            $payment->setBaseAmountAuthorized($amount);
+
             $payment->save();
             $order->save();
 
