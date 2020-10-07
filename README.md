@@ -17,6 +17,7 @@ php bin/magento module:enable QuickPay_Gateway
 php bin/magento setup:upgrade
 php bin/magento setup:static-content:deploy
 php bin/magento setup:di:compile
+php bin/magento cache:clean
 ``` 
 
 **Please note that FTP installation will not work as this module has requirements that will be auto installed when using composer**
