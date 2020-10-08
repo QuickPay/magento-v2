@@ -139,8 +139,26 @@ class Order extends AbstractHelper
             'save_in_address_book' => 0
         ];
 
-        $quote->getBillingAddress()->addData($defaultAddress);
-        $quote->getShippingAddress()->addData($defaultAddress);
+        $billingAddress = $defaultAddress;
+        if(!empty($quote->getBillingAddress())){
+            foreach($billingAddress as $key => $value){
+                if($value = $quote->getBillingAddress()->getData($key)){
+                    $billingAddress[$key] = $value;
+                }
+            }
+        }
+
+        $shippingAddress = $defaultAddress;
+        if(!empty($quote->getShippingAddress())){
+            foreach($shippingAddress as $key => $value){
+                if($value = $quote->getShippingAddress()->getData($key)){
+                    $shippingAddress[$key] = $value;
+                }
+            }
+        }
+
+        $quote->getBillingAddress()->addData($billingAddress);
+        $quote->getShippingAddress()->addData($shippingAddress);
 
         $shippingMethod = 'mobilepay_mobilepay';
         $shippingAddress = $quote->getShippingAddress();
@@ -201,11 +219,15 @@ class Order extends AbstractHelper
         $billingName = $this->splitCustomerName($billingAddress->name);
         $billingStreet = [$billingAddress->street, $billingAddress->house_number];
         $countryCode = $this->convertCountryAlphas3To2($billingAddress->country_code);
-        $order->getBillingAddress()->addData(
-            [
+
+        $defaultValue = 'DNK';
+
+        if($order->getBillingAddress()) {
+            $orderBilling = $order->getBillingAddress()->getData();
+            $billingAddressData = [
                 'firstname' => $billingName['firstname'],
                 'lastname' => $billingName['lastname'],
-                'street' => implode(' ',$billingStreet),
+                'street' => implode(' ', $billingStreet),
                 'city' => $billingAddress->city ? $billingAddress->city : '-',
                 'country_id' => $countryCode,
                 'region' => $billingAddress->region,
@@ -213,24 +235,44 @@ class Order extends AbstractHelper
                 'telephone' => $billingAddress->phone_number ? $billingAddress->phone_number : '-',
                 'vat_id' => $billingAddress->vat_no,
                 'save_in_address_book' => 0
-            ]
-        );
+            ];
+            foreach ($billingAddressData as $key => $value) {
+                if (isset($orderBilling[$key])) {
+                    if ($orderBilling[$key] != $defaultValue) {
+                        $billingAddressData[$key] = $orderBilling[$key];
+                    }
+                }
+            }
+            $order->getBillingAddress()->addData($billingAddressData);
+        }
 
         $shippingName = $this->splitCustomerName($shippingAddress->name);
         $shippingStreet = [$shippingAddress->street, $shippingAddress->house_number];
         $countryCode = $this->convertCountryAlphas3To2($shippingAddress->country_code);
-        $order->getShippingAddress()->addData([
-            'firstname' => $shippingName['firstname'],
-            'lastname' => $shippingName['lastname'],
-            'street' => implode(' ',$shippingStreet),
-            'city' => $shippingAddress->city ? $shippingAddress->city : '-',
-            'country_id' => $countryCode,
-            'region' => $shippingAddress->region,
-            'postcode' => $shippingAddress->zip_code ? $shippingAddress->zip_code : '-',
-            'telephone' => $shippingAddress->phone_number ? $shippingAddress->phone_number : '-',
-            'vat_id' => $shippingAddress->vat_no,
-            'save_in_address_book' => 0
-        ]);
+
+        if($order->getShippingAddress()) {
+            $orderShipping = $order->getShippingAddress()->getData();
+            $shippingAddressData = [
+                'firstname' => $shippingName['firstname'],
+                'lastname' => $shippingName['lastname'],
+                'street' => implode(' ', $shippingStreet),
+                'city' => $shippingAddress->city ? $shippingAddress->city : '-',
+                'country_id' => $countryCode,
+                'region' => $shippingAddress->region,
+                'postcode' => $shippingAddress->zip_code ? $shippingAddress->zip_code : '-',
+                'telephone' => $shippingAddress->phone_number ? $shippingAddress->phone_number : '-',
+                'vat_id' => $shippingAddress->vat_no,
+                'save_in_address_book' => 0
+            ];
+            foreach ($shippingAddressData as $key => $value) {
+                if (isset($orderShipping[$key])) {
+                    if ($orderShipping[$key] != $defaultValue) {
+                        $shippingAddressData[$key] = $orderShipping[$key];
+                    }
+                }
+            }
+            $order->getShippingAddress()->addData($shippingAddressData);
+        }
 
         try {
             $order->save();
