@@ -174,7 +174,7 @@ class QuickPayAdapter
                     'qty'        => (int) $item->getQtyOrdered(),
                     'item_no'    => $item->getSku(),
                     'item_name'  => $item->getName(),
-                    'item_price' => (int) ($item->getBasePriceInclTax() * 100),
+                    'item_price' => $item->getBasePriceInclTax() * 100,
                     'vat_rate'   => $item->getTaxPercent() / 100,
                 ];
             }
@@ -273,7 +273,7 @@ class QuickPayAdapter
                     'qty'        => (int) $item->getQty(),
                     'item_no'    => $item->getSku(),
                     'item_name'  => $item->getName(),
-                    'item_price' => (int) ($item->getBasePriceInclTax() * 100),
+                    'item_price' => $item->getBasePriceInclTax() * 100,
                     'vat_rate'   => $item->getTaxPercent() / 100,
                 ];
             }
