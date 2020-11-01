@@ -28,10 +28,15 @@ class CaptureOrderInvoiceAfter implements ObserverInterface
 
         $payment = $order->getPayment();
         if ($payment->getMethod() === \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE) {
-            $parts = explode('-', $payment->getLastTransId());
-            $transaction = $parts[0];
+            $captureCase = $invoice->getRequestedCaptureCase();
+            if ($payment->canCapture()) {
+                if ($captureCase == \Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE) {
+                    $parts = explode('-', $payment->getLastTransId());
+                    $transaction = $parts[0];
 
-            $this->adapter->capture($order, $transaction, $order->getGrandTotal());
+                    $this->adapter->capture($order, $transaction, $order->getGrandTotal());
+                }
+            }
         }
     }
 }

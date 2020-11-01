@@ -10,6 +10,7 @@ final class ConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'quickpay_gateway';
     const CODE_KLARNA = 'quickpay_klarna';
+    const CODE_MOBILEPAY = 'quickpay_mobilepay';
 
     const XML_PATH_CARD_LOGO = 'payment/quickpay_gateway/cardlogos';
 
@@ -40,6 +41,9 @@ final class ConfigProvider implements ConfigProviderInterface
                 ],
                 self::CODE_KLARNA => [
                     'paymentLogo' => $this->getKlarnaLogo()
+                ],
+                self::CODE_MOBILEPAY => [
+                    'paymentLogo' => $this->getMobilePayLogo()
                 ]
             ]
         ];
@@ -66,6 +70,14 @@ final class ConfigProvider implements ConfigProviderInterface
         $items = [];
 
         $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/klarna.png");
+
+        return $items;
+    }
+
+    public function getMobilePayLogo(){
+        $items = [];
+
+        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/mobilepay_payment.png");
 
         return $items;
     }

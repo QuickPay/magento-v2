@@ -192,8 +192,10 @@ class QuickPayAdapter
 
             $paymentId = $paymentArray['id'];
 
-            if($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_KLARNA){
+            if($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_KLARNA) {
                 $paymentMethods = 'klarna-payments';
+            } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_MOBILEPAY) {
+                $paymentMethods = 'mobilepay';
             } else {
                 $paymentMethods = $this->getPaymentMethods();
             }
