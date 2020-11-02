@@ -12,6 +12,7 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Module\ResourceInterface;
 use QuickPay\QuickPay;
 use Zend_Locale;
+use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
 
 /**
  * Class QuickPayAdapter
@@ -73,6 +74,11 @@ class QuickPayAdapter
     protected $moduleResource;
 
     /**
+     * @var Item
+     */
+    protected $taxItem;
+
+    /**
      * QuickPayAdapter constructor.
      *
      * @param LoggerInterface $logger
@@ -89,7 +95,8 @@ class QuickPayAdapter
         BuilderInterface $transactionBuilder,
         TransactionRepositoryInterface $transactionRepository,
         ResourceInterface $moduleResource,
-        DirectoryList $dir
+        DirectoryList $dir,
+        Item $taxItem
     )
     {
         $this->logger = $logger;
@@ -101,6 +108,7 @@ class QuickPayAdapter
         $this->transactionRepository = $transactionRepository;
         $this->moduleResource = $moduleResource;
         $this->dir = $dir;
+        $this->taxItem = $taxItem;
 
         $this->logger->pushHandler(new \Monolog\Handler\StreamHandler($this->dir->getRoot().'/var/log/quickpay.log'));
     }
@@ -130,6 +138,19 @@ class QuickPayAdapter
             }
 
             $shippingAddress = $order->getShippingAddress();
+
+            $taxItems = $this->taxItem->getTaxItemsByOrderId($order->getId());
+            $shippingVatRate = 0;
+            if (is_array($taxItems)) {
+                if (!empty($taxItems)) {
+                    foreach ($taxItems as $item) {
+                        if ($item['taxable_item_type'] === 'shipping') {
+                            $shippingVatRate = $item['tax_percent'];
+                        }
+                    }
+                }
+            }
+
             if($shippingAddress) {
                 $form['shipping_address'] = [];
                 $form['shipping_address']['name'] = $shippingAddress->getFirstName() . " " . $shippingAddress->getLastName();
@@ -146,7 +167,8 @@ class QuickPayAdapter
             }
 
             $form['shipping'] = [
-                'amount' => $order->getShippingInclTax() * 100
+                'amount' => $order->getShippingInclTax() * 100,
+                'vat_rate' => $shippingVatRate ? $shippingVatRate / 100 : 0
             ];
 
             $billingAddress = $order->getBillingAddress();
@@ -175,7 +197,7 @@ class QuickPayAdapter
                     'item_no'    => $item->getSku(),
                     'item_name'  => $item->getName(),
                     'item_price' => $item->getBasePriceInclTax() * 100,
-                    'vat_rate'   => $item->getTaxPercent() / 100,
+                    'vat_rate'   => $item->getTaxPercent() ? $item->getTaxPercent() / 100 : 0
                 ];
             }
 
