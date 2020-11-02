@@ -8,7 +8,7 @@ The main reason for the remake was to fix two main issues of QuickPay_Payment, n
 
 We highly suggest to test it on a staging/development environment first.
 
-Tested for Magento 2.0 / 2.1 / 2.2 / 2.3 (PHP version up to 7.2.11)
+Tested on Magento 2.3 / 2.4 (PHP version up to 7.4). If you are running and older version, please, try to update it first.
 
 ### Installation
 ```
