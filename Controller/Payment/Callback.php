@@ -128,11 +128,16 @@ class Callback extends \Magento\Framework\App\Action\Action
                 $operation = end($response->operations);
 
                 if ($response->accepted === true) {
+                    foreach($response->operations as $operation){
+                        if($operation->type == 'capture'){
+                            $autocapture = true;
+                        }
+                    }
+
                     /**
                      * Load order by incrementId
                      * @var Order $order
                      */
-
                     $order = $this->order->loadByIncrementId($response->order_id);
 
                     if($order->getId()){
