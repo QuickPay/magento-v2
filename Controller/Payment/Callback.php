@@ -246,7 +246,7 @@ class Callback extends \Magento\Framework\App\Action\Action
                         $this->sendOrderConfirmation($order);
                     }
 
-                    echo "OK";
+                    $this->getResponse()->setBody("OK");
                 }
             } else {
                 $this->logger->debug('Checksum mismatch');
