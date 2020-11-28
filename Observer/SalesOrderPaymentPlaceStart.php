@@ -32,7 +32,7 @@ class SalesOrderPaymentPlaceStart implements \Magento\Framework\Event\ObserverIn
         /** @var \Magento\Sales\Model\Order\Payment\Interceptor $payment */
         $payment = $observer->getPayment();
 
-        if ($payment->getMethod() === \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE) {
+        if (strpos($payment->getMethod(), 'quickpay') !== false) {
             $emailSend = $this->scopeConfig->getValue(self::SEND_ORDER_EMAIL_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $order = $payment->getOrder();
             if($emailSend) {
