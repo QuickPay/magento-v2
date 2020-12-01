@@ -106,13 +106,14 @@ class Klarna extends \Magento\Payment\Model\Method\AbstractMethod
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $adapter = $objectManager->get(\QuickPay\Gateway\Model\Adapter\QuickPayAdapter::class);
         $parts = explode('-',$payment->getTransactionId());
+        $order = $payment->getOrder();
         $transaction = $parts[0];
 
         if (!$this->canCapture()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('The capture action is not available.'));
         }
 
-        $adapter->capture($transaction, $amount);
+        $adapter->capture($order, $transaction, $amount);
 
         return $this;
     }
@@ -128,13 +129,14 @@ class Klarna extends \Magento\Payment\Model\Method\AbstractMethod
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $adapter = $objectManager->get(\QuickPay\Gateway\Model\Adapter\QuickPayAdapter::class);
         $parts = explode('-',$payment->getTransactionId());
+        $order = $payment->getOrder();
         $transaction = $parts[0];
 
         if (!$this->canRefund()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('The refund action is not available.'));
         }
 
-        $adapter->refund($transaction, $amount);
+        $adapter->refund($order, $transaction, $amount);
 
         return $this;
     }
@@ -148,9 +150,10 @@ class Klarna extends \Magento\Payment\Model\Method\AbstractMethod
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $adapter = $objectManager->get(\QuickPay\Gateway\Model\Adapter\QuickPayAdapter::class);
         $parts = explode('-',$payment->getTransactionId());
+        $order = $payment->getOrder();
         $transaction = $parts[0];
 
-        $adapter->cancel($transaction);
+        $adapter->cancel($order, $transaction);
 
         return $this;
     }
