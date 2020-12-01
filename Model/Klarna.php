@@ -106,7 +106,7 @@ class Klarna extends \Magento\Payment\Model\Method\AbstractMethod
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $adapter = $objectManager->get(\QuickPay\Gateway\Model\Adapter\QuickPayAdapter::class);
         $parts = explode('-',$payment->getTransactionId());
-		$order = $payment->getOrder();
+        $order = $payment->getOrder();
         $transaction = $parts[0];
 
         if (!$this->canCapture()) {
@@ -129,7 +129,7 @@ class Klarna extends \Magento\Payment\Model\Method\AbstractMethod
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $adapter = $objectManager->get(\QuickPay\Gateway\Model\Adapter\QuickPayAdapter::class);
         $parts = explode('-',$payment->getTransactionId());
-		$order = $payment->getOrder();
+        $order = $payment->getOrder();
         $transaction = $parts[0];
 
         if (!$this->canRefund()) {
@@ -150,7 +150,7 @@ class Klarna extends \Magento\Payment\Model\Method\AbstractMethod
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $adapter = $objectManager->get(\QuickPay\Gateway\Model\Adapter\QuickPayAdapter::class);
         $parts = explode('-',$payment->getTransactionId());
-		$order = $payment->getOrder();
+        $order = $payment->getOrder();
         $transaction = $parts[0];
 
         $adapter->cancel($order, $transaction);
