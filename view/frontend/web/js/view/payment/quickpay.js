@@ -18,8 +18,20 @@ define(
                 component: 'QuickPay_Gateway/js/view/payment/method-renderer/klarna'
             },
             {
+                type: 'quickpay_applepay',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/applepay'
+            },
+            {
                 type: 'quickpay_mobilepay',
                 component: 'QuickPay_Gateway/js/view/payment/method-renderer/mobilepay'
+            },
+            {
+                type: 'quickpay_vipps',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/vipps'
+            },
+            {
+                type: 'quickpay_paypal',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/paypal'
             }
         );
 
