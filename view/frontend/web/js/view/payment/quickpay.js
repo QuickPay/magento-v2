@@ -28,6 +28,10 @@ define(
             {
                 type: 'quickpay_paypal',
                 component: 'QuickPay_Gateway/js/view/payment/method-renderer/paypal'
+            },
+            {
+                type: 'quickpay_viabill',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/viabill'
             }
         );
 

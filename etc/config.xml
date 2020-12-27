@@ -116,6 +116,24 @@
                 <can_cancel>1</can_cancel>
                 <can_refund>1</can_refund>
             </quickpay_paypal>
+            <quickpay_viabill>
+                <model>QuickPay\Gateway\Model\ViaBill</model>
+                <title>QuickPay ViaBill</title>
+                <active>0</active>
+                <order_status>pending_payment</order_status>
+                <sort_order>5</sort_order>
+                <handlestock>1</handlestock>
+                <allowspecific>0</allowspecific>
+                <autocapture>0</autocapture>
+                <transactionfee>0</transactionfee>
+                <specifytransactionfee>0</specifytransactionfee>
+                <can_use_checkout>1</can_use_checkout>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_void>1</can_void>
+                <can_cancel>1</can_cancel>
+                <can_refund>1</can_refund>
+            </quickpay_viabill>
         </payment>
         <carriers>
             <mobilepay>

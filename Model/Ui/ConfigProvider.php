@@ -14,6 +14,7 @@ final class ConfigProvider implements ConfigProviderInterface
     const CODE_MOBILEPAY = 'quickpay_mobilepay';
     const CODE_VIPPS= 'quickpay_vipps';
     const CODE_PAYPAL = 'quickpay_paypal';
+    const CODE_VIABILL = 'quickpay_viabill';
 
     const XML_PATH_CARD_LOGO = 'payment/quickpay_gateway/cardlogos';
 
@@ -56,6 +57,9 @@ final class ConfigProvider implements ConfigProviderInterface
                 ],
                 self::CODE_PAYPAL => [
                     'paymentLogo' => $this->getPaypalLogo()
+                ],
+                self::CODE_VIABILL => [
+                    'paymentLogo' => $this->getViaBillLogo()
                 ]
             ]
         ];
@@ -114,6 +118,14 @@ final class ConfigProvider implements ConfigProviderInterface
         $items = [];
 
         $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/paypal.png");
+
+        return $items;
+    }
+
+    public function getViaBillLogo(){
+        $items = [];
+
+        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/viabill.png");
 
         return $items;
     }
