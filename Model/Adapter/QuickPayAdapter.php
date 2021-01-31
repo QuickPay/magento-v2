@@ -376,28 +376,34 @@ class QuickPayAdapter
      */
     public function capture($order, $transaction, $ammount)
     {
-        try {
-            $this->logger->debug("Capture payment");
+        $this->logger->debug("Capture payment");
 
-            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
-            $client = new QuickPay(":{$api_key}");
+        $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
+        $client = new QuickPay(":{$api_key}");
 
-            $form = [
-                'id' => $transaction,
-                'amount' => $ammount * 100,
-            ];
+        $form = [
+            'id' => $transaction,
+            'amount' => $ammount * 100,
+        ];
 
-            $payments = $client->request->post("/payments/{$transaction}/capture", $form);
-            $paymentArray = $payments->asArray();
+        $payments = $client->request->post("/payments/{$transaction}/capture", $form);
+        $paymentArray = $payments->asArray();
 
-            $this->logger->debug(json_encode($paymentArray));
+        $this->logger->debug(json_encode($paymentArray));
 
-            return $paymentArray;
-        } catch (\Exception $e) {
-            $this->logger->critical($e->getMessage());
+        if(isset($paymentArray['operations'])){
+            foreach($paymentArray['operations'] as $operation){
+                if($operation['type'] == 'capture' && !empty($operation['qp_status_code'])){
+                    if(in_array($operation['qp_status_code'], $this->errorCodes)){
+                        throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: '.$operation['qp_status_msg']));
+                    }
+                }
+            }
+        } else {
+            throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: Error.'));
         }
 
-        return true;
+        return $this;
     }
 
     /**
@@ -408,26 +414,31 @@ class QuickPayAdapter
      */
     public function cancel($order, $transaction)
     {
-        $this->logger->debug("Cancel payment");
-        try {
-            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
-            $client = new QuickPay(":{$api_key}");
+        $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
+        $client = new QuickPay(":{$api_key}");
 
-            $form = [
-                'id' => $transaction,
-            ];
+        $form = [
+            'id' => $transaction,
+        ];
 
-            $payments = $client->request->post("/payments/{$transaction}/cancel", $form);
-            $paymentArray = $payments->asArray();
+        $payments = $client->request->post("/payments/{$transaction}/cancel", $form);
+        $paymentArray = $payments->asArray();
 
-            $this->logger->debug(json_encode($paymentArray));
+        $this->logger->debug(json_encode($paymentArray));
 
-            return $paymentArray;
-        } catch (\Exception $e) {
-            $this->logger->critical($e->getMessage());
+        if(isset($paymentArray['operations'])){
+            foreach($paymentArray['operations'] as $operation){
+                if($operation['type'] == 'cancel' && !empty($operation['qp_status_code'])){
+                    if(in_array($operation['qp_status_code'], $this->errorCodes)){
+                        throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: '.$operation['qp_status_msg']));
+                    }
+                }
+            }
+        } else {
+            throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: Error.'));
         }
 
-        return true;
+        return $this;
     }
 
     /**
@@ -440,26 +451,32 @@ class QuickPayAdapter
     {
         $this->logger->debug("Refund payment");
 
-        try {
-            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
-            $client = new QuickPay(":{$api_key}");
+        $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
+        $client = new QuickPay(":{$api_key}");
 
-            $form = [
-                'id' => $transaction,
-                'amount' => $ammount * 100,
-            ];
+        $form = [
+            'id' => $transaction,
+            'amount' => $ammount * 100,
+        ];
 
-            $payments = $client->request->post("/payments/{$transaction}/refund", $form);
-            $paymentArray = $payments->asArray();
+        $payments = $client->request->post("/payments/{$transaction}/refund", $form);
+        $paymentArray = $payments->asArray();
 
-            $this->logger->debug(json_encode($paymentArray));
+        $this->logger->debug(json_encode($paymentArray));
 
-            return $paymentArray;
-        } catch (\Exception $e) {
-            $this->logger->critical($e->getMessage());
+        if(isset($paymentArray['operations'])){
+            foreach($paymentArray['operations'] as $operation){
+                if($operation['type'] == 'refund' && !empty($operation['qp_status_code'])){
+                    if(in_array($operation['qp_status_code'], $this->errorCodes)){
+                        throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: '.$operation['qp_status_msg']));
+                    }
+                }
+            }
+        } else {
+            throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: Error.'));
         }
 
-        return true;
+        return $this;
     }
 
     /**

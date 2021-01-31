@@ -3,6 +3,7 @@
 namespace QuickPay\Gateway\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\LocalizedException;
 
 class CancelOrderAfter implements ObserverInterface
 {
@@ -31,7 +32,11 @@ class CancelOrderAfter implements ObserverInterface
             $order = $payment->getOrder();
             $transaction = $parts[0];
 
-            $this->adapter->cancel($order, $transaction);
+            try {
+                $this->adapter->cancel($order, $transaction);
+            } catch (LocalizedException $e) {
+                throw new LocalizedException(__($e->getMessage()));
+            }
         }
     }
 }

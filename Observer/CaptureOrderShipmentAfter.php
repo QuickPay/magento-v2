@@ -3,6 +3,7 @@
 namespace QuickPay\Gateway\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\LocalizedException;
 
 class CaptureOrderShipmentAfter implements ObserverInterface
 {
@@ -30,7 +31,11 @@ class CaptureOrderShipmentAfter implements ObserverInterface
             $order = $payment->getOrder();
             $transaction = $parts[0];
 
-            $this->adapter->capture($order,$transaction, $order->getGrandTotal());
+            try {
+                $this->adapter->capture($order,$transaction, $order->getGrandTotal());
+            } catch (LocalizedException $e) {
+                throw new LocalizedException(__($e->getMessage()));
+            }
         }
     }
 }

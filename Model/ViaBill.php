@@ -106,13 +106,18 @@ class ViaBill extends \Magento\Payment\Model\Method\AbstractMethod
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $adapter = $objectManager->get(\QuickPay\Gateway\Model\Adapter\QuickPayAdapter::class);
         $parts = explode('-',$payment->getTransactionId());
+        $order = $payment->getOrder();
         $transaction = $parts[0];
 
         if (!$this->canCapture()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('The capture action is not available.'));
         }
 
-        $adapter->capture($transaction, $amount);
+        try {
+            $adapter->capture($order, $transaction, $amount);
+        } catch (LocalizedException $e) {
+            throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+        }
 
         return $this;
     }
@@ -128,13 +133,18 @@ class ViaBill extends \Magento\Payment\Model\Method\AbstractMethod
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $adapter = $objectManager->get(\QuickPay\Gateway\Model\Adapter\QuickPayAdapter::class);
         $parts = explode('-',$payment->getTransactionId());
+        $order = $payment->getOrder();
         $transaction = $parts[0];
 
         if (!$this->canRefund()) {
             throw new \Magento\Framework\Exception\LocalizedException(__('The refund action is not available.'));
         }
 
-        $adapter->refund($transaction, $amount);
+        try {
+            $adapter->refund($order, $transaction, $amount);
+        } catch (LocalizedException $e) {
+            throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+        }
 
         return $this;
     }
@@ -148,9 +158,14 @@ class ViaBill extends \Magento\Payment\Model\Method\AbstractMethod
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $adapter = $objectManager->get(\QuickPay\Gateway\Model\Adapter\QuickPayAdapter::class);
         $parts = explode('-',$payment->getTransactionId());
+        $order = $payment->getOrder();
         $transaction = $parts[0];
 
-        $adapter->cancel($transaction);
+        try {
+            $adapter->cancel($order, $transaction);
+        } catch (LocalizedException $e) {
+            throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+        }
 
         return $this;
     }
