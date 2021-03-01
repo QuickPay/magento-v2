@@ -133,7 +133,7 @@ class QuickPayAdapter
                 'currency' => $order->getOrderCurrency()->ToString(),
             ];
 
-            if ($textOnStatement = $this->scopeConfig->getValue(self::TEXT_ON_STATEMENT_XML_PATH)) {
+            if ($textOnStatement = $this->scopeConfig->getValue(self::TEXT_ON_STATEMENT_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
                 $form['text_on_statement'] = $textOnStatement;
             }
 
@@ -290,7 +290,7 @@ class QuickPayAdapter
                 'currency' => $quote->getQuoteCurrencyCode(),
             ];
 
-            if ($textOnStatement = $this->scopeConfig->getValue(self::TEXT_ON_STATEMENT_XML_PATH)) {
+            if ($textOnStatement = $this->scopeConfig->getValue(self::TEXT_ON_STATEMENT_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
                 $form['text_on_statement'] = $textOnStatement;
             }
 
