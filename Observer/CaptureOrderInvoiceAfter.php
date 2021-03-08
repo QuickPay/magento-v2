@@ -3,6 +3,7 @@
 namespace QuickPay\Gateway\Observer;
 use QuickPay\Gateway\Model\Ui\ConfigProvider;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\LocalizedException;
 
 class CaptureOrderInvoiceAfter implements ObserverInterface
 {
@@ -25,7 +26,6 @@ class CaptureOrderInvoiceAfter implements ObserverInterface
     {
         $invoice = $observer->getEvent()->getInvoice();
         $order = $invoice->getOrder();
-
         $payment = $order->getPayment();
         if (in_array($payment->getMethod(),[ConfigProvider::CODE,ConfigProvider::CODE_KLARNA,ConfigProvider::CODE_MOBILEPAY])) {
             $captureCase = $invoice->getRequestedCaptureCase();
@@ -34,7 +34,11 @@ class CaptureOrderInvoiceAfter implements ObserverInterface
                     $parts = explode('-', $payment->getLastTransId());
                     $transaction = $parts[0];
 
-                    $this->adapter->capture($order, $transaction, $order->getGrandTotal());
+                    try {
+                        $this->adapter->capture($order, $transaction, $order->getGrandTotal());
+                    } catch (LocalizedException $e) {
+                        throw new LocalizedException(__($e->getMessage()));
+                    }
                 }
             }
         }

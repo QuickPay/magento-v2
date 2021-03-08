@@ -113,7 +113,11 @@ class Klarna extends \Magento\Payment\Model\Method\AbstractMethod
             throw new \Magento\Framework\Exception\LocalizedException(__('The capture action is not available.'));
         }
 
-        $adapter->capture($order, $transaction, $amount);
+        try {
+            $adapter->capture($order, $transaction, $amount);
+        } catch (LocalizedException $e) {
+            throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+        }
 
         return $this;
     }
@@ -136,7 +140,11 @@ class Klarna extends \Magento\Payment\Model\Method\AbstractMethod
             throw new \Magento\Framework\Exception\LocalizedException(__('The refund action is not available.'));
         }
 
-        $adapter->refund($order, $transaction, $amount);
+        try {
+            $adapter->refund($order, $transaction, $amount);
+        } catch (LocalizedException $e) {
+            throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+        }
 
         return $this;
     }
@@ -153,7 +161,11 @@ class Klarna extends \Magento\Payment\Model\Method\AbstractMethod
         $order = $payment->getOrder();
         $transaction = $parts[0];
 
-        $adapter->cancel($order, $transaction);
+        try {
+            $adapter->cancel($order, $transaction);
+        } catch (LocalizedException $e) {
+            throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+        }
 
         return $this;
     }

@@ -5,19 +5,19 @@ namespace QuickPay\Gateway\Model;
 /**
  * Pay In Store payment method model
  */
-class MobilePay extends \Magento\Payment\Model\Method\AbstractMethod
+class PayPal extends \Magento\Payment\Model\Method\AbstractMethod
 {
     /**
      * Payment code
      *
      * @var string
      */
-    protected $_code = 'quickpay_mobilepay';
+    protected $_code = 'quickpay_paypal';
 
     /**
      * @var string
      */
-    protected $_title = 'MobilePay';
+    protected $_title = 'PayPal';
 
     /**
      * Availability option

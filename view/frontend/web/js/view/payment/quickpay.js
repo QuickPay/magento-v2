@@ -20,6 +20,18 @@ define(
             {
                 type: 'quickpay_mobilepay',
                 component: 'QuickPay_Gateway/js/view/payment/method-renderer/mobilepay'
+            },
+            {
+                type: 'quickpay_vipps',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/vipps'
+            },
+            {
+                type: 'quickpay_paypal',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/paypal'
+            },
+            {
+                type: 'quickpay_viabill',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/viabill'
             }
         );
 

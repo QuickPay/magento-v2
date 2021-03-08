@@ -10,7 +10,11 @@ final class ConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'quickpay_gateway';
     const CODE_KLARNA = 'quickpay_klarna';
+    const CODE_APPLEPAY = 'quickpay_applepay';
     const CODE_MOBILEPAY = 'quickpay_mobilepay';
+    const CODE_VIPPS= 'quickpay_vipps';
+    const CODE_PAYPAL = 'quickpay_paypal';
+    const CODE_VIABILL = 'quickpay_viabill';
 
     const XML_PATH_CARD_LOGO = 'payment/quickpay_gateway/cardlogos';
 
@@ -42,8 +46,20 @@ final class ConfigProvider implements ConfigProviderInterface
                 self::CODE_KLARNA => [
                     'paymentLogo' => $this->getKlarnaLogo()
                 ],
+                self::CODE_APPLEPAY => [
+                    'paymentLogo' => $this->getApplePayLogo()
+                ],
                 self::CODE_MOBILEPAY => [
                     'paymentLogo' => $this->getMobilePayLogo()
+                ],
+                self::CODE_VIPPS => [
+                    'paymentLogo' => $this->getVippsLogo()
+                ],
+                self::CODE_PAYPAL => [
+                    'paymentLogo' => $this->getPaypalLogo()
+                ],
+                self::CODE_VIABILL => [
+                    'paymentLogo' => $this->getViaBillLogo()
                 ]
             ]
         ];
@@ -74,10 +90,42 @@ final class ConfigProvider implements ConfigProviderInterface
         return $items;
     }
 
+    public function getApplePayLogo(){
+        $items = [];
+
+        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/applepay.png");
+
+        return $items;
+    }
+
     public function getMobilePayLogo(){
         $items = [];
 
         $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/mobilepay_payment.png");
+
+        return $items;
+    }
+
+    public function getVippsLogo(){
+        $items = [];
+
+        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/vipps.png");
+
+        return $items;
+    }
+
+    public function getPaypalLogo(){
+        $items = [];
+
+        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/paypal.png");
+
+        return $items;
+    }
+
+    public function getViaBillLogo(){
+        $items = [];
+
+        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/viabill.png");
 
         return $items;
     }

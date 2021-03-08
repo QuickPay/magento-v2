@@ -63,6 +63,10 @@ class PaymentLogo implements \Magento\Framework\Option\ArrayInterface
             [
                 'value' => 'paypal',
                 'label' => __('Paypal')
+            ],
+            [
+                'value' => 'applepay',
+                'label' => __('Apple Pay')
             ]
         ];
     }

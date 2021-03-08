@@ -137,69 +137,71 @@ class QuickPayAdapter
                 $form['text_on_statement'] = $textOnStatement;
             }
 
-            $shippingAddress = $order->getShippingAddress();
+            if($order->getPayment()->getMethod() != \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_PAYPAL) {
+                $shippingAddress = $order->getShippingAddress();
 
-            $taxItems = $this->taxItem->getTaxItemsByOrderId($order->getId());
-            $shippingVatRate = 0;
-            if (is_array($taxItems)) {
-                if (!empty($taxItems)) {
-                    foreach ($taxItems as $item) {
-                        if ($item['taxable_item_type'] === 'shipping') {
-                            $shippingVatRate = $item['tax_percent'];
+                $taxItems = $this->taxItem->getTaxItemsByOrderId($order->getId());
+                $shippingVatRate = 0;
+                if (is_array($taxItems)) {
+                    if (!empty($taxItems)) {
+                        foreach ($taxItems as $item) {
+                            if ($item['taxable_item_type'] === 'shipping') {
+                                $shippingVatRate = $item['tax_percent'];
+                            }
                         }
                     }
                 }
+
+                if ($shippingAddress) {
+                    $form['shipping_address'] = [];
+                    $form['shipping_address']['name'] = $shippingAddress->getFirstName() . " " . $shippingAddress->getLastName();
+                    $form['shipping_address']['street'] = $shippingAddress->getStreetLine(1);
+                    $form['shipping_address']['city'] = $shippingAddress->getCity();
+                    $form['shipping_address']['zip_code'] = $shippingAddress->getPostcode();
+                    $form['shipping_address']['region'] = $shippingAddress->getRegionCode();
+                    $form['shipping_address']['country_code'] = Zend_Locale::getTranslation($shippingAddress->getCountryId(), 'Alpha3ToTerritory');
+                    $form['shipping_address']['phone_number'] = $shippingAddress->getTelephone();
+                    $form['shipping_address']['email'] = $shippingAddress->getEmail();
+                    $form['shipping_address']['house_number'] = '';
+                    $form['shipping_address']['house_extension'] = '';
+                    $form['shipping_address']['mobile_number'] = '';
+                }
+
+                $form['shipping'] = [
+                    'amount' => $order->getShippingInclTax() * 100,
+                    'vat_rate' => $shippingVatRate ? $shippingVatRate / 100 : 0
+                ];
+
+                $billingAddress = $order->getBillingAddress();
+                $form['invoice_address'] = [];
+                $form['invoice_address']['name'] = $billingAddress->getFirstName() . " " . $billingAddress->getLastName();
+                $form['invoice_address']['street'] = implode(' ', $billingAddress->getStreet());
+                $form['invoice_address']['city'] = $billingAddress->getCity();
+                $form['invoice_address']['zip_code'] = $billingAddress->getPostcode();
+                $form['invoice_address']['region'] = $billingAddress->getRegionCode();
+                $form['invoice_address']['country_code'] = Zend_Locale::getTranslation($billingAddress->getCountryId(), 'Alpha3ToTerritory');
+                $form['invoice_address']['phone_number'] = $billingAddress->getTelephone();
+                $form['invoice_address']['email'] = $billingAddress->getEmail();
+                $form['invoice_address']['house_number'] = '';
+                $form['invoice_address']['house_extension'] = '';
+                $form['invoice_address']['mobile_number'] = '';
+
+                //Build basket array
+                $form['basket'] = [];
+                foreach ($order->getAllVisibleItems() as $item) {
+                    $form['basket'][] = [
+                        'qty' => (int)$item->getQtyOrdered(),
+                        'item_no' => $item->getSku(),
+                        'item_name' => $item->getName(),
+                        'item_price' => $item->getBasePriceInclTax() * 100,
+                        'vat_rate' => $item->getTaxPercent() ? $item->getTaxPercent() / 100 : 0
+                    ];
+                }
             }
-
-            if($shippingAddress) {
-                $form['shipping_address'] = [];
-                $form['shipping_address']['name'] = $shippingAddress->getFirstName() . " " . $shippingAddress->getLastName();
-                $form['shipping_address']['street'] = $shippingAddress->getStreetLine(1);
-                $form['shipping_address']['city'] = $shippingAddress->getCity();
-                $form['shipping_address']['zip_code'] = $shippingAddress->getPostcode();
-                $form['shipping_address']['region'] = $shippingAddress->getRegionCode();
-                $form['shipping_address']['country_code'] = Zend_Locale::getTranslation($shippingAddress->getCountryId(), 'Alpha3ToTerritory');
-                $form['shipping_address']['phone_number'] = $shippingAddress->getTelephone();
-                $form['shipping_address']['email'] = $shippingAddress->getEmail();
-                $form['shipping_address']['house_number'] = '';
-                $form['shipping_address']['house_extension'] = '';
-                $form['shipping_address']['mobile_number'] = '';
-            }
-
-            $form['shipping'] = [
-                'amount' => $order->getShippingInclTax() * 100,
-                'vat_rate' => $shippingVatRate ? $shippingVatRate / 100 : 0
-            ];
-
-            $billingAddress = $order->getBillingAddress();
-            $form['invoice_address'] = [];
-            $form['invoice_address']['name'] = $billingAddress->getFirstName() . " " . $billingAddress->getLastName();
-            $form['invoice_address']['street'] = implode(' ', $billingAddress->getStreet());
-            $form['invoice_address']['city'] = $billingAddress->getCity();
-            $form['invoice_address']['zip_code'] = $billingAddress->getPostcode();
-            $form['invoice_address']['region'] = $billingAddress->getRegionCode();
-            $form['invoice_address']['country_code'] = Zend_Locale::getTranslation($billingAddress->getCountryId(), 'Alpha3ToTerritory');
-            $form['invoice_address']['phone_number'] = $billingAddress->getTelephone();
-            $form['invoice_address']['email'] = $billingAddress->getEmail();
-            $form['invoice_address']['house_number'] = '';
-            $form['invoice_address']['house_extension'] = '';
-            $form['invoice_address']['mobile_number'] = '';
 
             $form['shopsystem'] = [];
             $form['shopsystem']['name'] = 'Magento 2';
             $form['shopsystem']['version'] = $this->moduleResource->getDbVersion('QuickPay_Gateway');
-
-            //Build basket array
-            $form['basket'] = [];
-            foreach ($order->getAllVisibleItems() as $item) {
-                $form['basket'][] = [
-                    'qty'        => (int) $item->getQtyOrdered(),
-                    'item_no'    => $item->getSku(),
-                    'item_name'  => $item->getName(),
-                    'item_price' => $item->getBasePriceInclTax() * 100,
-                    'vat_rate'   => $item->getTaxPercent() ? $item->getTaxPercent() / 100 : 0
-                ];
-            }
 
             $payments = $client->request->post('/payments', $form);
 
@@ -218,6 +220,12 @@ class QuickPayAdapter
                 $paymentMethods = 'klarna-payments';
             } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_MOBILEPAY) {
                 $paymentMethods = 'mobilepay';
+            } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_VIPPS){
+                $paymentMethods = 'vipps';
+            } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_PAYPAL) {
+                $paymentMethods = 'paypal';
+            } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_VIABILL) {
+                $paymentMethods = 'viabill';
             } else {
                 $paymentMethods = $this->getPaymentMethods();
             }
@@ -368,28 +376,34 @@ class QuickPayAdapter
      */
     public function capture($order, $transaction, $ammount)
     {
-        try {
-            $this->logger->debug("Capture payment");
+        $this->logger->debug("Capture payment");
 
-            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
-            $client = new QuickPay(":{$api_key}");
+        $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
+        $client = new QuickPay(":{$api_key}");
 
-            $form = [
-                'id' => $transaction,
-                'amount' => $ammount * 100,
-            ];
+        $form = [
+            'id' => $transaction,
+            'amount' => $ammount * 100,
+        ];
 
-            $payments = $client->request->post("/payments/{$transaction}/capture", $form);
-            $paymentArray = $payments->asArray();
+        $payments = $client->request->post("/payments/{$transaction}/capture", $form);
+        $paymentArray = $payments->asArray();
 
-            $this->logger->debug(json_encode($paymentArray));
+        $this->logger->debug(json_encode($paymentArray));
 
-            return $paymentArray;
-        } catch (\Exception $e) {
-            $this->logger->critical($e->getMessage());
+        if(isset($paymentArray['operations'])){
+            foreach($paymentArray['operations'] as $operation){
+                if($operation['type'] == 'capture' && !empty($operation['qp_status_code'])){
+                    if(in_array($operation['qp_status_code'], $this->errorCodes)){
+                        throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: '.$operation['qp_status_msg']));
+                    }
+                }
+            }
+        } else {
+            throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: Error.'));
         }
 
-        return true;
+        return $this;
     }
 
     /**
@@ -400,26 +414,31 @@ class QuickPayAdapter
      */
     public function cancel($order, $transaction)
     {
-        $this->logger->debug("Cancel payment");
-        try {
-            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
-            $client = new QuickPay(":{$api_key}");
+        $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
+        $client = new QuickPay(":{$api_key}");
 
-            $form = [
-                'id' => $transaction,
-            ];
+        $form = [
+            'id' => $transaction,
+        ];
 
-            $payments = $client->request->post("/payments/{$transaction}/cancel", $form);
-            $paymentArray = $payments->asArray();
+        $payments = $client->request->post("/payments/{$transaction}/cancel", $form);
+        $paymentArray = $payments->asArray();
 
-            $this->logger->debug(json_encode($paymentArray));
+        $this->logger->debug(json_encode($paymentArray));
 
-            return $paymentArray;
-        } catch (\Exception $e) {
-            $this->logger->critical($e->getMessage());
+        if(isset($paymentArray['operations'])){
+            foreach($paymentArray['operations'] as $operation){
+                if($operation['type'] == 'cancel' && !empty($operation['qp_status_code'])){
+                    if(in_array($operation['qp_status_code'], $this->errorCodes)){
+                        throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: '.$operation['qp_status_msg']));
+                    }
+                }
+            }
+        } else {
+            throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: Error.'));
         }
 
-        return true;
+        return $this;
     }
 
     /**
@@ -432,26 +451,32 @@ class QuickPayAdapter
     {
         $this->logger->debug("Refund payment");
 
-        try {
-            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
-            $client = new QuickPay(":{$api_key}");
+        $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
+        $client = new QuickPay(":{$api_key}");
 
-            $form = [
-                'id' => $transaction,
-                'amount' => $ammount * 100,
-            ];
+        $form = [
+            'id' => $transaction,
+            'amount' => $ammount * 100,
+        ];
 
-            $payments = $client->request->post("/payments/{$transaction}/refund", $form);
-            $paymentArray = $payments->asArray();
+        $payments = $client->request->post("/payments/{$transaction}/refund", $form);
+        $paymentArray = $payments->asArray();
 
-            $this->logger->debug(json_encode($paymentArray));
+        $this->logger->debug(json_encode($paymentArray));
 
-            return $paymentArray;
-        } catch (\Exception $e) {
-            $this->logger->critical($e->getMessage());
+        if(isset($paymentArray['operations'])){
+            foreach($paymentArray['operations'] as $operation){
+                if($operation['type'] == 'refund' && !empty($operation['qp_status_code'])){
+                    if(in_array($operation['qp_status_code'], $this->errorCodes)){
+                        throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: '.$operation['qp_status_msg']));
+                    }
+                }
+            }
+        } else {
+            throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: Error.'));
         }
 
-        return true;
+        return $this;
     }
 
     /**
