@@ -109,8 +109,6 @@ class QuickPayAdapter
         $this->moduleResource = $moduleResource;
         $this->dir = $dir;
         $this->taxItem = $taxItem;
-
-        $this->logger->pushHandler(new \Monolog\Handler\StreamHandler($this->dir->getRoot().'/var/log/quickpay.log'));
     }
 
     /**

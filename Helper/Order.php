@@ -67,8 +67,6 @@ class Order extends AbstractHelper
         $this->dir = $dir;
         $this->logger = $logger;
         $this->scopeConfig = $scopeConfig;
-
-        $this->logger->pushHandler(new \Monolog\Handler\StreamHandler($this->dir->getRoot().'/var/log/quickpay.log'));
     }
 
     /**
