@@ -3,6 +3,7 @@ namespace QuickPay\Gateway\Model\Adapter;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Locale\ResolverInterface;
+use Magento\Framework\Phrase;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface;
 use Psr\Log\LoggerInterface;
@@ -398,7 +399,18 @@ class QuickPayAdapter
                 }
             }
         } else {
-            throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: Error.'));
+            /** IK: we process validation errors from payment gateway */
+            $message = __('Error');
+            if(isset($paymentArray['message']) || isset($paymentArray['errors'])){
+                $message = $paymentArray['message']??__('Error');
+                if(isset($paymentArray['errors']) && is_array($paymentArray['errors'])){
+                    $message .= ':';
+                    foreach ($paymentArray['errors'] as $_field => $_validationError){
+                        $message .= sprintf(' %s - %s',$_field,  implode(',',$_validationError));
+                    }
+                }
+            }
+            throw new \Magento\Framework\Exception\LocalizedException(new Phrase(__('QuickPay').' '.$message));
         }
 
         return $this;
