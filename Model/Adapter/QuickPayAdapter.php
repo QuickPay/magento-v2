@@ -5,6 +5,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\Phrase;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\UrlInterface;
@@ -110,6 +111,27 @@ class QuickPayAdapter
         $this->moduleResource = $moduleResource;
         $this->dir = $dir;
         $this->taxItem = $taxItem;
+    }
+
+    /**
+     * Function processes validation errors from payment gateway
+     *
+     * @param array $paymentArray
+     *
+     * @return string
+     */
+    protected function _generateErrorMessageLine($paymentArray){
+        $message = __('Error');
+        if(isset($paymentArray['message']) || isset($paymentArray['errors'])){
+            $message = $paymentArray['message']??__('Error');
+            if(isset($paymentArray['errors']) && is_array($paymentArray['errors'])){
+                $message .= ':';
+                foreach ($paymentArray['errors'] as $_field => $_validationError){
+                    $message .= sprintf(' %s - %s',$_field,  implode(',',$_validationError));
+                }
+            }
+        }
+        return $message;
     }
 
     /**
@@ -370,8 +392,12 @@ class QuickPayAdapter
     /**
      * Capture payment
      *
-     * @param array $attributes
-     * @return array|bool
+     * @param Order $order
+     * @param string $transaction
+     * @param float $ammount
+     *
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function capture($order, $transaction, $ammount)
     {
@@ -400,17 +426,7 @@ class QuickPayAdapter
             }
         } else {
             /** IK: we process validation errors from payment gateway */
-            $message = __('Error');
-            if(isset($paymentArray['message']) || isset($paymentArray['errors'])){
-                $message = $paymentArray['message']??__('Error');
-                if(isset($paymentArray['errors']) && is_array($paymentArray['errors'])){
-                    $message .= ':';
-                    foreach ($paymentArray['errors'] as $_field => $_validationError){
-                        $message .= sprintf(' %s - %s',$_field,  implode(',',$_validationError));
-                    }
-                }
-            }
-            throw new \Magento\Framework\Exception\LocalizedException(new Phrase(__('QuickPay').' '.$message));
+            throw new \Magento\Framework\Exception\LocalizedException(new Phrase(__('QuickPay').' '.$this->_generateErrorMessageLine($paymentArray)));
         }
 
         return $this;
@@ -419,11 +435,16 @@ class QuickPayAdapter
     /**
      * Cancel payment
      *
-     * @param array $attributes
-     * @return array|bool
+     * @param Order $order
+     * @param string $transaction
+     *
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function cancel($order, $transaction)
     {
+        if(empty(trim($transaction))) return $this;
+
         $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
         $client = new QuickPay(":{$api_key}");
 
@@ -445,7 +466,8 @@ class QuickPayAdapter
                 }
             }
         } else {
-            throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: Error.'));
+            /** IK: we process validation errors from payment gateway */
+            throw new \Magento\Framework\Exception\LocalizedException(new Phrase(__('QuickPay').' '.$this->_generateErrorMessageLine($paymentArray)));
         }
 
         return $this;
@@ -454,8 +476,12 @@ class QuickPayAdapter
     /**
      * Refund payment
      *
-     * @param array $attributes
-     * @return array|bool
+     * @param Order $order
+     * @param string $transaction
+     * @param float $ammount
+     *
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function refund($order, $transaction, $ammount)
     {
@@ -483,7 +509,8 @@ class QuickPayAdapter
                 }
             }
         } else {
-            throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: Error.'));
+            /** IK: we process validation errors from payment gateway */
+            throw new \Magento\Framework\Exception\LocalizedException(new Phrase(__('QuickPay').' '.$this->_generateErrorMessageLine($paymentArray)));
         }
 
         return $this;
