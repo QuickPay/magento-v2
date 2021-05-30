@@ -32,10 +32,12 @@ class CancelOrderAfter implements ObserverInterface
             $order = $payment->getOrder();
             $transaction = $parts[0];
 
-            try {
-                $this->adapter->cancel($order, $transaction);
-            } catch (LocalizedException $e) {
-                throw new LocalizedException(__($e->getMessage()));
+            if($transaction) {
+                try {
+                    $this->adapter->cancel($order, $transaction);
+                } catch (LocalizedException $e) {
+                    throw new LocalizedException(__($e->getMessage()));
+                }
             }
         }
     }

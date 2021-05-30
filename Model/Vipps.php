@@ -161,10 +161,12 @@ class Vipps extends \Magento\Payment\Model\Method\AbstractMethod
         $order = $payment->getOrder();
         $transaction = $parts[0];
 
-        try {
-            $adapter->cancel($order, $transaction);
-        } catch (LocalizedException $e) {
-            throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+        if($transaction) {
+            try {
+                $adapter->cancel($order, $transaction);
+            } catch (LocalizedException $e) {
+                throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+            }
         }
 
         return $this;

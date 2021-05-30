@@ -32,6 +32,10 @@ define(
             {
                 type: 'quickpay_viabill',
                 component: 'QuickPay_Gateway/js/view/payment/method-renderer/viabill'
+            },
+            {
+                type: 'quickpay_swish',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/swish'
             }
         );
 
