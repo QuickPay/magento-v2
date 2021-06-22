@@ -36,6 +36,10 @@ define(
             {
                 type: 'quickpay_swish',
                 component: 'QuickPay_Gateway/js/view/payment/method-renderer/swish'
+            },
+            {
+                type: 'quickpay_trustly',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/trustly'
             }
         );
 

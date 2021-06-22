@@ -226,6 +226,8 @@ class QuickPayAdapter
                 $paymentMethods = 'viabill';
             }elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_SWISH) {
                 $paymentMethods = 'swish';
+            } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_TRUSTLY) {
+                $paymentMethods = 'trustly';
             } else {
                 $paymentMethods = $this->getPaymentMethods();
             }
