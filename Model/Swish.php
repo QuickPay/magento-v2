@@ -5,19 +5,19 @@ namespace QuickPay\Gateway\Model;
 /**
  * Pay In Store payment method model
  */
-class ViaBill extends \Magento\Payment\Model\Method\AbstractMethod
+class Swish extends \Magento\Payment\Model\Method\AbstractMethod
 {
     /**
      * Payment code
      *
      * @var string
      */
-    protected $_code = 'quickpay_viabill';
+    protected $_code = 'quickpay_swish';
 
     /**
      * @var string
      */
-    protected $_title = 'ViaBill';
+    protected $_title = 'Swish';
 
     /**
      * Availability option
@@ -109,14 +109,16 @@ class ViaBill extends \Magento\Payment\Model\Method\AbstractMethod
         $order = $payment->getOrder();
         $transaction = $parts[0];
 
-        if (!$this->canCapture()) {
-            throw new \Magento\Framework\Exception\LocalizedException(__('The capture action is not available.'));
-        }
+        if(!$order->hasInvoices()) {
+            if (!$this->canCapture()) {
+                throw new \Magento\Framework\Exception\LocalizedException(__('The capture action is not available.'));
+            }
 
-        try {
-            $adapter->capture($order, $transaction, $amount);
-        } catch (LocalizedException $e) {
-            throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+            try {
+                $adapter->capture($order, $transaction, $amount);
+            } catch (LocalizedException $e) {
+                throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+            }
         }
 
         return $this;

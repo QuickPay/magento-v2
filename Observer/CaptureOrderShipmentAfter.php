@@ -34,7 +34,7 @@ class CaptureOrderShipmentAfter implements ObserverInterface
             try {
                 $this->adapter->capture($order,$transaction, $order->getGrandTotal());
             } catch (LocalizedException $e) {
-                throw new LocalizedException(__($e->getMessage()));
+                //throw new LocalizedException(__($e->getMessage()));
             }
         }
     }
