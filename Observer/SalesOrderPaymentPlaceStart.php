@@ -1,7 +1,7 @@
 <?php
 
 namespace QuickPay\Gateway\Observer;
-
+use QuickPay\Gateway\Model\Ui\ConfigProvider;
 use Magento\Framework\Event\Observer;
 
 class SalesOrderPaymentPlaceStart implements \Magento\Framework\Event\ObserverInterface
@@ -32,7 +32,16 @@ class SalesOrderPaymentPlaceStart implements \Magento\Framework\Event\ObserverIn
         /** @var \Magento\Sales\Model\Order\Payment\Interceptor $payment */
         $payment = $observer->getPayment();
 
-        if (strpos($payment->getMethod(), 'quickpay') !== false) {
+        if (in_array($payment->getMethod(),[
+	        ConfigProvider::CODE,
+	        ConfigProvider::CODE_KLARNA,
+	        ConfigProvider::CODE_MOBILEPAY,
+	        ConfigProvider::CODE_VIPPS,
+	        ConfigProvider::CODE_PAYPAL,
+	        ConfigProvider::CODE_VIABILL,
+	        ConfigProvider::CODE_SWISH,
+	        ConfigProvider::CODE_TRUSTLY
+        ])) {
             $emailSend = $this->scopeConfig->getValue(self::SEND_ORDER_EMAIL_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $order = $payment->getOrder();
             if($emailSend) {
