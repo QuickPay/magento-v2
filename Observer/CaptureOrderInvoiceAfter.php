@@ -35,7 +35,8 @@ class CaptureOrderInvoiceAfter implements ObserverInterface
 	        ConfigProvider::CODE_PAYPAL,
 	        ConfigProvider::CODE_VIABILL,
 	        ConfigProvider::CODE_SWISH,
-	        ConfigProvider::CODE_TRUSTLY
+	        ConfigProvider::CODE_TRUSTLY,
+            ConfigProvider::CODE_ANYDAY
         ])) {
             $captureCase = $invoice->getRequestedCaptureCase();
             if ($payment->canCapture()) {

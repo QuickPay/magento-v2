@@ -58,7 +58,8 @@ class SendPaymentEmail implements ObserverInterface
 	        ConfigProvider::CODE_PAYPAL,
 	        ConfigProvider::CODE_VIABILL,
 	        ConfigProvider::CODE_SWISH,
-	        ConfigProvider::CODE_TRUSTLY
+	        ConfigProvider::CODE_TRUSTLY,
+            ConfigProvider::CODE_ANYDAY
         ])) {
             $this->savePaymentLink($order);
             $this->sendPaymentEmail($order);
@@ -129,7 +130,7 @@ class SendPaymentEmail implements ObserverInterface
             $this->_inlineTranslation->resume();
 
         } catch(\Exception $e){
-            exit;
+            throw new \Exception($e->getMessage());
         }
 
 

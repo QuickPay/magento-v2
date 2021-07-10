@@ -17,6 +17,7 @@ final class ConfigProvider implements ConfigProviderInterface
     const CODE_VIABILL = 'quickpay_viabill';
     const CODE_SWISH = 'quickpay_swish';
     const CODE_TRUSTLY = 'quickpay_trustly';
+    const CODE_ANYDAY = 'quickpay_anyday';
 
     const XML_PATH_CARD_LOGO = 'payment/quickpay_gateway/cardlogos';
 
@@ -68,6 +69,9 @@ final class ConfigProvider implements ConfigProviderInterface
                 ],
                 self::CODE_TRUSTLY => [
                     'paymentLogo' => $this->getTrustlyLogo()
+                ],
+                self::CODE_ANYDAY => [
+                    'paymentLogo' => $this->getAnydayLogo()
                 ]
             ]
         ];
@@ -150,6 +154,14 @@ final class ConfigProvider implements ConfigProviderInterface
         $items = [];
 
         $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/trustly.svg");
+
+        return $items;
+    }
+
+    public function getAnydayLogo(){
+        $items = [];
+
+        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/anydaysplit.svg");
 
         return $items;
     }

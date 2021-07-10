@@ -40,6 +40,10 @@ define(
             {
                 type: 'quickpay_trustly',
                 component: 'QuickPay_Gateway/js/view/payment/method-renderer/trustly'
+            },
+            {
+                type: 'quickpay_anyday',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/anyday'
             }
         );
 

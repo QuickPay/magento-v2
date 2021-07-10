@@ -5,7 +5,7 @@ namespace QuickPay\Gateway\Block\Order\Payment;
 class Info extends \Magento\Payment\Block\Info{
     protected function _prepareSpecificInformation($transport = null)
     {
-        if($this->getMethod()->getCode() == 'quickpay_gateway'){
+        if (strpos($this->getMethod()->getCode(), 'quickpay') !== false) {
             $payment = $this->getInfo();
             $additional = $payment->getAdditionalInformation();
             if(isset($additional['method_title'])){
