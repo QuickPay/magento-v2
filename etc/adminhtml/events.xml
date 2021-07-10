@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!--
+    we don't need to capture money after create shipment document. It is a bit weird logic.
     <event name="sales_order_shipment_save_after">
         <observer name="quickpay_capture_after_shipment" instance="QuickPay\Gateway\Observer\CaptureOrderShipmentAfter" />
-    </event>
+    </event> -->
     <event name="sales_order_invoice_pay">
         <observer name="quickpay_capture_after_invoice" instance="QuickPay\Gateway\Observer\CaptureOrderInvoiceAfter" />
     </event>

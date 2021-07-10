@@ -1,7 +1,7 @@
 <?php
 
 namespace QuickPay\Gateway\Observer;
-
+use QuickPay\Gateway\Model\Ui\ConfigProvider;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
 
@@ -27,7 +27,16 @@ class CaptureOrderInvoiceAfter implements ObserverInterface
         $invoice = $observer->getEvent()->getInvoice();
         $order = $invoice->getOrder();
         $payment = $order->getPayment();
-        if ($payment->getMethod() === \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE) {
+        if (in_array($payment->getMethod(),[
+	        ConfigProvider::CODE,
+	        ConfigProvider::CODE_KLARNA,
+	        ConfigProvider::CODE_MOBILEPAY,
+	        ConfigProvider::CODE_VIPPS,
+	        ConfigProvider::CODE_PAYPAL,
+	        ConfigProvider::CODE_VIABILL,
+	        ConfigProvider::CODE_SWISH,
+	        ConfigProvider::CODE_TRUSTLY
+        ])) {
             $captureCase = $invoice->getRequestedCaptureCase();
             if ($payment->canCapture()) {
                 if ($captureCase == \Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE) {

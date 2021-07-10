@@ -1,7 +1,7 @@
 <?php
 
 namespace QuickPay\Gateway\Observer;
-
+use QuickPay\Gateway\Model\Ui\ConfigProvider;
 use Magento\Framework\Event\ObserverInterface;
 
 class SendPaymentEmail implements ObserverInterface
@@ -50,7 +50,16 @@ class SendPaymentEmail implements ObserverInterface
         $order = $observer->getEvent()->getOrder();
 
         $payment = $order->getPayment();
-        if ($payment->getMethod() === \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE) {
+        if (in_array($payment->getMethod(),[
+	        ConfigProvider::CODE,
+	        ConfigProvider::CODE_KLARNA,
+	        ConfigProvider::CODE_MOBILEPAY,
+	        ConfigProvider::CODE_VIPPS,
+	        ConfigProvider::CODE_PAYPAL,
+	        ConfigProvider::CODE_VIABILL,
+	        ConfigProvider::CODE_SWISH,
+	        ConfigProvider::CODE_TRUSTLY
+        ])) {
             $this->savePaymentLink($order);
             $this->sendPaymentEmail($order);
         }
