@@ -13,6 +13,7 @@ class Callback extends \Magento\Framework\App\Action\Action
     const AUTOCAPTURE_XML_PATH            = 'payment/quickpay_gateway/autocapture';
     const TRANSACTION_FEE_SKU             = 'transaction_fee';
     const SEND_INVOICE_EMAIL_XML_PATH     = 'payment/quickpay_gateway/send_invoice_email';
+    const AUTOCAPTURE_TRUSTLY_XML_PATH    = 'payment/quickpay_trustly/autocapture';
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -126,17 +127,23 @@ class Callback extends \Magento\Framework\App\Action\Action
                 $operation = end($response->operations);
 
                 if ($response->accepted === true) {
-                    foreach($response->operations as $operation){
-                        if($operation->type == 'capture'){
-                            $autocapture = true;
-                        }
-                    }
-
                     /**
                      * Load order by incrementId
                      * @var Order $order
                      */
                     $order = $this->order->loadByIncrementId($response->order_id);
+
+                    if($order->getPayment()->getMethodInstance()->getCode() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_TRUSTLY){
+                        if($this->scopeConfig->getValue(self::AUTOCAPTURE_TRUSTLY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)){
+                            $autocapture = true;
+                        }
+                    } else {
+                        foreach($response->operations as $operation){
+                            if($operation->type == 'capture'){
+                                $autocapture = true;
+                            }
+                        }
+                    }
 
                     if($order->getId()){
                         if($order->getState() == \Magento\Sales\Model\Order::STATE_PROCESSING){

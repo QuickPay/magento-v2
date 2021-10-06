@@ -52,7 +52,6 @@
                 <sort_order>3</sort_order>
                 <handlestock>1</handlestock>
                 <allowspecific>0</allowspecific>
-                <autocapture>0</autocapture>
                 <transactionfee>0</transactionfee>
                 <specifytransactionfee>0</specifytransactionfee>
                 <can_use_checkout>1</can_use_checkout>
@@ -71,7 +70,6 @@
                 <sort_order>4</sort_order>
                 <handlestock>1</handlestock>
                 <allowspecific>0</allowspecific>
-                <autocapture>0</autocapture>
                 <transactionfee>0</transactionfee>
                 <specifytransactionfee>0</specifytransactionfee>
                 <can_use_checkout>1</can_use_checkout>
@@ -89,7 +87,6 @@
                 <sort_order>4</sort_order>
                 <handlestock>1</handlestock>
                 <allowspecific>0</allowspecific>
-                <autocapture>0</autocapture>
                 <transactionfee>0</transactionfee>
                 <specifytransactionfee>0</specifytransactionfee>
                 <can_use_checkout>1</can_use_checkout>
@@ -107,7 +104,6 @@
                 <sort_order>4</sort_order>
                 <handlestock>1</handlestock>
                 <allowspecific>0</allowspecific>
-                <autocapture>0</autocapture>
                 <transactionfee>0</transactionfee>
                 <specifytransactionfee>0</specifytransactionfee>
                 <can_use_checkout>1</can_use_checkout>
@@ -125,7 +121,6 @@
                 <sort_order>5</sort_order>
                 <handlestock>1</handlestock>
                 <allowspecific>0</allowspecific>
-                <autocapture>0</autocapture>
                 <transactionfee>0</transactionfee>
                 <specifytransactionfee>0</specifytransactionfee>
                 <can_use_checkout>1</can_use_checkout>
@@ -143,7 +138,6 @@
                 <sort_order>6</sort_order>
                 <handlestock>1</handlestock>
                 <allowspecific>0</allowspecific>
-                <autocapture>0</autocapture>
                 <transactionfee>0</transactionfee>
                 <specifytransactionfee>0</specifytransactionfee>
                 <can_use_checkout>1</can_use_checkout>
@@ -179,7 +173,6 @@
                 <sort_order>8</sort_order>
                 <handlestock>1</handlestock>
                 <allowspecific>0</allowspecific>
-                <autocapture>0</autocapture>
                 <transactionfee>0</transactionfee>
                 <specifytransactionfee>0</specifytransactionfee>
                 <can_use_checkout>1</can_use_checkout>
