@@ -14,6 +14,7 @@
                 <active>1</active>
                 <testmode>0</testmode>
                 <order_status>pending_payment</order_status>
+                <payment_template>quickpay_makepayment_email_template</payment_template>
                 <sort_order>1</sort_order>
                 <agreementid>ENTER YOUR AGREEMENT ID HERE</agreementid>
                 <cardtype>0</cardtype>

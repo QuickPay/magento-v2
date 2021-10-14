@@ -6,6 +6,8 @@ use Magento\Framework\Event\ObserverInterface;
 
 class SendPaymentEmail implements ObserverInterface
 {
+    const PAYMENT_LINK_EMAIL_XML_PATH = 'payment/quickpay_gateway/payment_template';
+
     /**
      * @var QuickPay\Gateway\Model\Adapter\QuickPayAdapter
      */
@@ -51,14 +53,14 @@ class SendPaymentEmail implements ObserverInterface
 
         $payment = $order->getPayment();
         if (in_array($payment->getMethod(),[
-	        ConfigProvider::CODE,
-	        ConfigProvider::CODE_KLARNA,
-	        ConfigProvider::CODE_MOBILEPAY,
-	        ConfigProvider::CODE_VIPPS,
-	        ConfigProvider::CODE_PAYPAL,
-	        ConfigProvider::CODE_VIABILL,
-	        ConfigProvider::CODE_SWISH,
-	        ConfigProvider::CODE_TRUSTLY,
+            ConfigProvider::CODE,
+            ConfigProvider::CODE_KLARNA,
+            ConfigProvider::CODE_MOBILEPAY,
+            ConfigProvider::CODE_VIPPS,
+            ConfigProvider::CODE_PAYPAL,
+            ConfigProvider::CODE_VIABILL,
+            ConfigProvider::CODE_SWISH,
+            ConfigProvider::CODE_TRUSTLY,
             ConfigProvider::CODE_ANYDAY
         ])) {
             $this->savePaymentLink($order);
@@ -109,12 +111,14 @@ class SendPaymentEmail implements ObserverInterface
             $sentToEmail = $order->getCustomerEmail();
             $sentToName = $order->getCustomerName();
 
+            $templateId = $this->_scopeConfig->getValue(self::PAYMENT_LINK_EMAIL_XML_PATH,\Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
+
             $transport = $this->_transportBuilder
-                ->setTemplateIdentifier('quickpay_makepayment_email_template')
+                ->setTemplateIdentifier($templateId)
                 ->setTemplateOptions(
                     [
                         'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
-                        'store' => \Magento\Store\Model\Store::DEFAULT_STORE_ID,
+                        'store' => $order->getStoreId(),
                     ]
                 )
                 ->setTemplateVars([
@@ -128,7 +132,6 @@ class SendPaymentEmail implements ObserverInterface
             $transport->sendMessage();
 
             $this->_inlineTranslation->resume();
-
         } catch(\Exception $e){
             throw new \Exception($e->getMessage());
         }

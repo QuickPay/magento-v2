@@ -204,6 +204,11 @@ class QuickPayAdapter
                 ];
 
                 $billingAddress = $order->getBillingAddress();
+                $mobileNumber = '';
+                if($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_MOBILEPAY) {
+                    $mobileNumber = $billingAddress->getTelephone();
+                }
+
                 $form['invoice_address'] = [];
                 $form['invoice_address']['name'] = $billingAddress->getFirstName() . " " . $billingAddress->getLastName();
                 $form['invoice_address']['street'] = implode(' ', $billingAddress->getStreet());
@@ -215,7 +220,7 @@ class QuickPayAdapter
                 $form['invoice_address']['email'] = $billingAddress->getEmail();
                 $form['invoice_address']['house_number'] = '';
                 $form['invoice_address']['house_extension'] = '';
-                $form['invoice_address']['mobile_number'] = '';
+                $form['invoice_address']['mobile_number'] = $mobileNumber;
 
                 //Build basket array
                 $form['basket'] = [];
