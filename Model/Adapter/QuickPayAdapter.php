@@ -205,7 +205,8 @@ class QuickPayAdapter
 
                 $billingAddress = $order->getBillingAddress();
                 $mobileNumber = '';
-                if($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_MOBILEPAY) {
+                if($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_MOBILEPAY
+                    || $order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE) {
                     $mobileNumber = $billingAddress->getTelephone();
                 }
 
