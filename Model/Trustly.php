@@ -109,16 +109,14 @@ class Trustly extends \Magento\Payment\Model\Method\AbstractMethod
         $order = $payment->getOrder();
         $transaction = $parts[0];
 
-        if(!$order->hasInvoices()) {
-            if (!$this->canCapture()) {
-                throw new \Magento\Framework\Exception\LocalizedException(__('The capture action is not available.'));
-            }
+        if (!$this->canCapture()) {
+            throw new \Magento\Framework\Exception\LocalizedException(__('The capture action is not available.'));
+        }
 
-            try {
-                $adapter->capture($order, $transaction, $amount);
-            } catch (LocalizedException $e) {
-                throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
-            }
+        try {
+            $adapter->capture($order, $transaction, $amount);
+        } catch (LocalizedException $e) {
+            throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
         }
 
         return $this;
