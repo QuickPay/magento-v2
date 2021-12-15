@@ -226,11 +226,15 @@ class QuickPayAdapter
                 //Build basket array
                 $form['basket'] = [];
                 foreach ($order->getAllVisibleItems() as $item) {
+                    $discount = 0;
+                    if ($item->getDiscountAmount()) {
+                        $discount = $item->getDiscountAmount() / $item->getQtyOrdered();
+                    }
                     $form['basket'][] = [
                         'qty' => (int)$item->getQtyOrdered(),
                         'item_no' => $item->getSku(),
                         'item_name' => $item->getName(),
-                        'item_price' => $item->getPriceInclTax() * 100,
+                        'item_price' => round($item->getPriceInclTax() - $discount, 2) * 100,
                         'vat_rate' => $item->getTaxPercent() ? $item->getTaxPercent() / 100 : 0
                     ];
                 }
@@ -344,12 +348,16 @@ class QuickPayAdapter
             //Build basket array
             $form['basket'] = [];
             foreach ($quote->getAllVisibleItems() as $item) {
+                $discount = 0;
+                if ($item->getDiscountAmount()) {
+                    $discount = $item->getDiscountAmount() / $item->getQtyOrdered();
+                }
                 $form['basket'][] = [
-                    'qty'        => (int) $item->getQty(),
-                    'item_no'    => $item->getSku(),
-                    'item_name'  => $item->getName(),
-                    'item_price' => $item->getPriceInclTax() * 100,
-                    'vat_rate'   => $item->getTaxPercent() / 100,
+                    'qty' => (int)$item->getQtyOrdered(),
+                    'item_no' => $item->getSku(),
+                    'item_name' => $item->getName(),
+                    'item_price' => round($item->getPriceInclTax() - $discount, 2) * 100,
+                    'vat_rate' => $item->getTaxPercent() ? $item->getTaxPercent() / 100 : 0
                 ];
             }
             //$form['invoice_address_selection'] = 1;
