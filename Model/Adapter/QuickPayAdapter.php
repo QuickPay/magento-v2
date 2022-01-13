@@ -30,6 +30,11 @@ class QuickPayAdapter
     const BRANDING_ID_XML_PATH = 'payment/quickpay_gateway/branding_id';
     const TEST_MODE_XML_PATH = 'payment/quickpay_gateway/testmode';
 
+    const STATUS_ACCEPTED_CODE = 202;
+    const CAPTURE_CODE = 'capture';
+    const REFUND_CODE = 'refund';
+    const CANCEL_CODE = 'cancel';
+
     protected static $errorCodes = [
         '30100',
         '40000',
@@ -443,7 +448,7 @@ class QuickPayAdapter
 
         $payments = $client->request->post("/payments/{$transaction}/capture", $form);
 
-        $this->validateResponse($order, $payments);
+        $this->validateResponse($order, $payments, self::CAPTURE_CODE);
 
         return $this;
     }
@@ -470,7 +475,7 @@ class QuickPayAdapter
 
         $payments = $client->request->post("/payments/{$transaction}/cancel", $form);
 
-        $this->validateResponse($order, $payments);
+        $this->validateResponse($order, $payments, self::CANCEL_CODE);
 
         return $this;
     }
@@ -499,7 +504,7 @@ class QuickPayAdapter
 
         $payments = $client->request->post("/payments/{$transaction}/refund", $form);
 
-        $this->validateResponse($order, $payments);
+        $this->validateResponse($order, $payments, self::REFUND_CODE);
 
         return $this;
     }
@@ -614,31 +619,36 @@ class QuickPayAdapter
     /**
      * @param $order
      * @param $payments
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function validateResponse($order, $payments){
+    public function validateResponse($order, $payments, $type){
         $status = $payments->httpStatus();
 
         $paymentArray = $payments->asArray();
         $this->logger->debug(json_encode($paymentArray));
 
-        if($status != '202'){
-            if($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_ANYDAY
-                || $order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_KLARNA){
+        if($status != self::STATUS_ACCEPTED_CODE
+            && ($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_ANYDAY
+                || $order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_KLARNA)){
+
+            if($type == self::CAPTURE_CODE){
                 throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: payment not captured'));
-            } else {
-                if(isset($paymentArray['operations'])){
-                    foreach($paymentArray['operations'] as $operation){
-                        if($operation['type'] == 'capture' && !empty($operation['qp_status_code'])){
-                            if(in_array($operation['qp_status_code'], static::$errorCodes)){
-                                throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: '.$operation['qp_status_msg']));
-                            }
-                        }
+            } elseif($type == self::CAPTURE_REFUND) {
+                throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: payment not refunded'));
+            }
+        }
+
+        if(isset($paymentArray['operations'])){
+            foreach($paymentArray['operations'] as $operation){
+                if(!empty($operation['qp_status_code'])){
+                    if(in_array($operation['qp_status_code'], static::$errorCodes)){
+                        throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: '.$operation['qp_status_msg']));
                     }
-                } else {
-                    /** IK: we process validation errors from payment gateway */
-                    throw new \Magento\Framework\Exception\LocalizedException(new Phrase(__('QuickPay').' '.$this->_generateErrorMessageLine($paymentArray)));
                 }
             }
+        } else {
+            /** IK: we process validation errors from payment gateway */
+            throw new \Magento\Framework\Exception\LocalizedException(new Phrase(__('QuickPay').' '.$this->_generateErrorMessageLine($paymentArray)));
         }
     }
 }
