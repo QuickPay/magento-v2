@@ -53,15 +53,16 @@ class SendPaymentEmail implements ObserverInterface
 
         $payment = $order->getPayment();
         if (in_array($payment->getMethod(),[
-            ConfigProvider::CODE,
-            ConfigProvider::CODE_KLARNA,
-            ConfigProvider::CODE_MOBILEPAY,
-            ConfigProvider::CODE_VIPPS,
-            ConfigProvider::CODE_PAYPAL,
-            ConfigProvider::CODE_VIABILL,
-            ConfigProvider::CODE_SWISH,
-            ConfigProvider::CODE_TRUSTLY,
-            ConfigProvider::CODE_ANYDAY
+	        ConfigProvider::CODE,
+	        ConfigProvider::CODE_KLARNA,
+	        ConfigProvider::CODE_MOBILEPAY,
+	        ConfigProvider::CODE_VIPPS,
+	        ConfigProvider::CODE_PAYPAL,
+	        ConfigProvider::CODE_VIABILL,
+	        ConfigProvider::CODE_SWISH,
+	        ConfigProvider::CODE_TRUSTLY,
+            ConfigProvider::CODE_ANYDAY,
+            ConfigProvider::CODE_APPLEPAY
         ])) {
             $this->savePaymentLink($order);
             $this->sendPaymentEmail($order);

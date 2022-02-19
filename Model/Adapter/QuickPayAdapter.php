@@ -278,6 +278,8 @@ class QuickPayAdapter
                 $paymentMethods = 'trustly';
             } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_ANYDAY) {
                 $paymentMethods = 'anyday-split';
+            } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_APPLEPAY) {
+                $paymentMethods = 'applepay';
             } else {
                 $paymentMethods = $this->getPaymentMethods();
             }

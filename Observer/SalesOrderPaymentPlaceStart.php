@@ -41,7 +41,8 @@ class SalesOrderPaymentPlaceStart implements \Magento\Framework\Event\ObserverIn
 	        ConfigProvider::CODE_VIABILL,
 	        ConfigProvider::CODE_SWISH,
 	        ConfigProvider::CODE_TRUSTLY,
-            ConfigProvider::CODE_ANYDAY
+            ConfigProvider::CODE_ANYDAY,
+            ConfigProvider::CODE_APPLEPAY
         ])) {
             $emailSend = $this->scopeConfig->getValue(self::SEND_ORDER_EMAIL_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $order = $payment->getOrder();

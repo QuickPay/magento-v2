@@ -44,6 +44,10 @@ define(
             {
                 type: 'quickpay_anyday',
                 component: 'QuickPay_Gateway/js/view/payment/method-renderer/anyday'
+            },
+            {
+                type: 'quickpay_applepay',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/applepay'
             }
         );
 

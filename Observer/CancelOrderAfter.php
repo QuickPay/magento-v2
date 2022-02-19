@@ -36,7 +36,8 @@ class CancelOrderAfter implements ObserverInterface
 	        ConfigProvider::CODE_VIABILL,
 	        ConfigProvider::CODE_SWISH,
 	        ConfigProvider::CODE_TRUSTLY,
-            ConfigProvider::CODE_ANYDAY
+            ConfigProvider::CODE_ANYDAY,
+            ConfigProvider::CODE_APPLEPAY
 	        ])) {
             $parts = explode('-', $payment->getLastTransId());
             $order = $payment->getOrder();
