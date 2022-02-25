@@ -166,7 +166,7 @@ class QuickPayAdapter
 
             $form = [
                 'order_id' => $order->getIncrementId(),
-                'currency' => $order->getOrderCurrency()->ToString(),
+                'currency' => $order->getBaseCurrency()->ToString(),
             ];
 
             if ($textOnStatement = $this->scopeConfig->getValue(self::TEXT_ON_STATEMENT_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
@@ -204,7 +204,7 @@ class QuickPayAdapter
                 }
 
                 $form['shipping'] = [
-                    'amount' => $order->getShippingInclTax() * 100,
+                    'amount' => $order->getBaseShippingInclTax() * 100,
                     'vat_rate' => $shippingVatRate ? $shippingVatRate / 100 : 0
                 ];
 
@@ -232,14 +232,14 @@ class QuickPayAdapter
                 $form['basket'] = [];
                 foreach ($order->getAllVisibleItems() as $item) {
                     $discount = 0;
-                    if ($item->getDiscountAmount()) {
-                        $discount = $item->getDiscountAmount() / $item->getQtyOrdered();
+                    if ($item->getBaseDiscountAmount()) {
+                        $discount = $item->getBaseDiscountAmount() / $item->getQtyOrdered();
                     }
                     $form['basket'][] = [
                         'qty' => (int)$item->getQtyOrdered(),
                         'item_no' => $item->getSku(),
                         'item_name' => $item->getName(),
-                        'item_price' => round($item->getPriceInclTax() - $discount, 2) * 100,
+                        'item_price' => round($item->getBasePriceInclTax() - $discount, 2) * 100,
                         'vat_rate' => $item->getTaxPercent() ? $item->getTaxPercent() / 100 : 0
                     ];
                 }
@@ -285,7 +285,7 @@ class QuickPayAdapter
             }
 
             $parameters = [
-                "amount"             => $order->getTotalDue() * 100,
+                "amount"             => $order->getBaseTotalDue() * 100,
                 "continueurl"        => $this->url->getUrl('quickpaygateway/payment/returns'),
                 "cancelurl"          => $this->url->getUrl('quickpaygateway/payment/cancel'),
                 "callbackurl"        => $this->url->getUrl('quickpaygateway/payment/callback'),
@@ -341,7 +341,7 @@ class QuickPayAdapter
 
             $form = [
                 'order_id' => $quote->getReservedOrderId(),
-                'currency' => $quote->getQuoteCurrencyCode(),
+                'currency' => $quote->getBaseCurrencyCode(),
             ];
 
             if ($textOnStatement = $this->scopeConfig->getValue(self::TEXT_ON_STATEMENT_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
@@ -356,14 +356,14 @@ class QuickPayAdapter
             $form['basket'] = [];
             foreach ($quote->getAllVisibleItems() as $item) {
                 $discount = 0;
-                if ($item->getDiscountAmount()) {
-                    $discount = $item->getDiscountAmount() / $item->getQtyOrdered();
+                if ($item->getBaseDiscountAmount()) {
+                    $discount = $item->getBaseDiscountAmount() / $item->getQtyOrdered();
                 }
                 $form['basket'][] = [
                     'qty' => (int)$item->getQtyOrdered(),
                     'item_no' => $item->getSku(),
                     'item_name' => $item->getName(),
-                    'item_price' => round($item->getPriceInclTax() - $discount, 2) * 100,
+                    'item_price' => round($item->getBasePriceInclTax() - $discount, 2) * 100,
                     'vat_rate' => $item->getTaxPercent() ? $item->getTaxPercent() / 100 : 0
                 ];
             }
@@ -388,7 +388,7 @@ class QuickPayAdapter
             $paymentId = $paymentArray['id'];
 
             $parameters = [
-                "amount"             => $quote->getGrandTotal() * 100,
+                "amount"             => $quote->getBaseGrandTotal() * 100,
                 "continueurl"        => $this->url->getUrl('quickpaygateway/payment/returns'),
                 "cancelurl"          => $this->url->getUrl('quickpaygateway/payment/cancel'),
                 "callbackurl"        => $this->url->getUrl('quickpaygateway/payment/callback'),
@@ -566,7 +566,7 @@ class QuickPayAdapter
             $payment = $order->getPayment();
 
             $formatedPrice = $order->getBaseCurrency()->formatTxt(
-                $order->getGrandTotal()
+                $order->getBaseGrandTotal()
             );
 
             $message = '';
@@ -606,7 +606,7 @@ class QuickPayAdapter
             $payment->setParentTransactionId($parent_id);
 
             // update totals
-            $amount = $order->getGrandTotal();
+            $amount = $order->getBaseGrandTotal();
             $amount = $payment->formatAmount($amount, true);
             $payment->setBaseAmountAuthorized($amount);
 
@@ -642,7 +642,7 @@ class QuickPayAdapter
 
         if(isset($paymentArray['operations'])){
             foreach($paymentArray['operations'] as $operation){
-                if(!empty($operation['qp_status_code'])){
+                if(!empty($operation['qp_status_code']) && $operation['type'] == $type){
                     if(in_array($operation['qp_status_code'], static::$errorCodes)){
                         throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: '.$operation['qp_status_msg']));
                     }
