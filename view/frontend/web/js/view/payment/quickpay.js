@@ -48,6 +48,10 @@ define(
             {
                 type: 'quickpay_applepay',
                 component: 'QuickPay_Gateway/js/view/payment/method-renderer/applepay'
+            },
+            {
+                type: 'quickpay_googlepay',
+                component: 'QuickPay_Gateway/js/view/payment/method-renderer/googlepay'
             }
         );
 

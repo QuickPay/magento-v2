@@ -18,6 +18,7 @@ final class ConfigProvider implements ConfigProviderInterface
     const CODE_SWISH = 'quickpay_swish';
     const CODE_TRUSTLY = 'quickpay_trustly';
     const CODE_ANYDAY = 'quickpay_anyday';
+    const CODE_GOOGLEPAY = 'quickpay_googlepay';
 
     const XML_PATH_CARD_LOGO = 'payment/quickpay_gateway/cardlogos';
 
@@ -72,7 +73,10 @@ final class ConfigProvider implements ConfigProviderInterface
                 ],
                 self::CODE_ANYDAY => [
                     'paymentLogo' => $this->getAnydayLogo()
-                ]
+                ],
+                self::CODE_GOOGLEPAY => [
+                    'paymentLogo' => $this->getGooglePayLogo()
+                ],
             ]
         ];
     }
@@ -162,6 +166,14 @@ final class ConfigProvider implements ConfigProviderInterface
         $items = [];
 
         $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/anydaysplit.svg");
+
+        return $items;
+    }
+
+    public function getGooglePayLogo(){
+        $items = [];
+
+        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/googlepay.png");
 
         return $items;
     }

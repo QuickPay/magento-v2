@@ -62,7 +62,8 @@ class SendPaymentEmail implements ObserverInterface
 	        ConfigProvider::CODE_SWISH,
 	        ConfigProvider::CODE_TRUSTLY,
             ConfigProvider::CODE_ANYDAY,
-            ConfigProvider::CODE_APPLEPAY
+            ConfigProvider::CODE_APPLEPAY,
+            ConfigProvider::CODE_GOOGLEPAY
         ])) {
             $this->savePaymentLink($order);
             $this->sendPaymentEmail($order);
