@@ -279,7 +279,7 @@ class QuickPayAdapter
             } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_ANYDAY) {
                 $paymentMethods = 'anyday-split';
             } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_APPLEPAY) {
-                $paymentMethods = 'applepay';
+                $paymentMethods = 'apple-pay';
             } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_GOOGLEPAY) {
                 $paymentMethods = 'google-pay';
             } else {
