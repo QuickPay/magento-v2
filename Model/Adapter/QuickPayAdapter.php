@@ -637,7 +637,7 @@ class QuickPayAdapter
 
             if($type == self::CAPTURE_CODE){
                 throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: payment not captured'));
-            } elseif($type == self::CAPTURE_REFUND) {
+            } elseif($type == self::REFUND_CODE) {
                 throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: payment not refunded'));
             }
         }
