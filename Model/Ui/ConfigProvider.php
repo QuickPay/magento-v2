@@ -83,7 +83,7 @@ final class ConfigProvider implements ConfigProviderInterface
 
     public function getQuickPayCardLogo(){
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-        $cards = explode(',', $this->scopeConfig->getValue(self::XML_PATH_CARD_LOGO, $storeScope));
+        $cards = explode(',', $this->scopeConfig->getValue(self::XML_PATH_CARD_LOGO, $storeScope) ?? '');
 
         $items = [];
 

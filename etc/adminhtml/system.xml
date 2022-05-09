@@ -40,6 +40,11 @@
                     <label>New Order Status</label>
                     <source_model>Magento\Sales\Model\Config\Source\Order\Status\NewStatus</source_model>
                 </field>
+                <field id="cancel_period" translate="label" type="text" sortOrder="63" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Order Cancel Period (hours)</label>
+                    <frontend_class>validate-number</frontend_class>
+                    <comment>Automatically cancel not paid orders after specific period. Leave field empty to disable this functionality.</comment>
+                </field>
                 <field id="allowspecific" translate="label" type="allowspecific" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment From Applicable Countries</label>
                     <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
