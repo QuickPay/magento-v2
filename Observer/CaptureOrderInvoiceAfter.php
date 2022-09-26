@@ -41,9 +41,9 @@ class CaptureOrderInvoiceAfter implements ObserverInterface
             ConfigProvider::CODE_GOOGLEPAY
         ])) {
             $captureCase = $invoice->getRequestedCaptureCase();
-            if ($payment->canCapture()) {
+            if ($payment->canCapture() && !$order->hasInvoices()) {
                 if ($captureCase == \Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE) {
-                    $parts = explode('-', $payment->getLastTransId());
+                    $parts = explode('-', $payment->getLastTransId() ?? '');
                     $transaction = $parts[0];
 
                     try {

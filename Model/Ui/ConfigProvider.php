@@ -84,13 +84,19 @@ final class ConfigProvider implements ConfigProviderInterface
     public function getQuickPayCardLogo(){
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $cards = explode(',', $this->scopeConfig->getValue(self::XML_PATH_CARD_LOGO, $storeScope) ?? '');
+        $cardsSvg = ['maestro', 'mastercard', 'visa'];
 
         $items = [];
 
         if(count($cards)) {
             foreach ($cards as $card) {
                 if($card) {
-                    $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/logo/{$card}.png");
+                    if(in_array($card, $cardsSvg)){
+                        $ext = 'svg';
+                    } else {
+                        $ext = 'png';
+                    }
+                    $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/logo/{$card}.{$ext}");
                 }
             }
         }
@@ -101,7 +107,7 @@ final class ConfigProvider implements ConfigProviderInterface
     public function getKlarnaLogo(){
         $items = [];
 
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/klarna.png");
+        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/klarna.svg");
 
         return $items;
     }
@@ -109,7 +115,7 @@ final class ConfigProvider implements ConfigProviderInterface
     public function getApplePayLogo(){
         $items = [];
 
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/applepay.png");
+        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/apple-pay.svg");
 
         return $items;
     }
@@ -133,7 +139,7 @@ final class ConfigProvider implements ConfigProviderInterface
     public function getPaypalLogo(){
         $items = [];
 
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/paypal.png");
+        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/paypal.svg");
 
         return $items;
     }
@@ -173,7 +179,7 @@ final class ConfigProvider implements ConfigProviderInterface
     public function getGooglePayLogo(){
         $items = [];
 
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/googlepay.png");
+        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/google-pay.svg");
 
         return $items;
     }

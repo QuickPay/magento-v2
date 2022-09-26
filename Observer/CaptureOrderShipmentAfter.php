@@ -51,7 +51,7 @@ class CaptureOrderShipmentAfter implements ObserverInterface
                 ConfigProvider::CODE_APPLEPAY,
                 ConfigProvider::CODE_GOOGLEPAY
             ])) {
-                $parts = explode('-', $payment->getLastTransId());
+                $parts = explode('-', $payment->getLastTransId() ?? '');
                 $order = $payment->getOrder();
                 $transaction = $parts[0];
 
