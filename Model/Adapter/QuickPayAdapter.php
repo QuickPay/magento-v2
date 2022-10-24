@@ -267,7 +267,7 @@ class QuickPayAdapter
             } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_MOBILEPAY) {
                 $paymentMethods = 'mobilepay';
             } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_VIPPS){
-                $paymentMethods = 'vipps';
+                $paymentMethods = 'vipps,vippspsp';
             } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_PAYPAL) {
                 $paymentMethods = 'paypal';
             } elseif($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_VIABILL) {
