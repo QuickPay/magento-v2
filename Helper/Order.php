@@ -43,14 +43,19 @@ class Order extends AbstractHelper
     protected $scopeConfig;
 
     /**
-     * Order constructor.
+     * @var \Magento\Directory\Model\Country
+     */
+    protected $country;
+
+    /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\App\ResourceConnection $resource
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Magento\Quote\Model\QuoteManagement $quoteManagement
      * @param \Magento\Framework\App\Filesystem\DirectoryList $dir
      * @param \Psr\Log\LoggerInterface $logger
-     * @throws \Exception
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Directory\Model\Country $country
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -59,7 +64,8 @@ class Order extends AbstractHelper
         \Magento\Quote\Model\QuoteManagement $quoteManagement,
         \Magento\Framework\App\Filesystem\DirectoryList $dir,
         \Psr\Log\LoggerInterface $logger,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Directory\Model\Country $country
     ){
         $this->resource = $resource;
         $this->quoteRepository = $quoteRepository;
@@ -67,6 +73,7 @@ class Order extends AbstractHelper
         $this->dir = $dir;
         $this->logger = $logger;
         $this->scopeConfig = $scopeConfig;
+        $this->country = $country;
     }
 
     /**
@@ -128,6 +135,7 @@ class Order extends AbstractHelper
 
         $defaultValue = 'DNK';
         $countryCode = $this->getCountryByWebsite();
+
         $defaultAddress = [
             'firstname' => $defaultValue,
             'lastname' => $defaultValue,
@@ -140,6 +148,12 @@ class Order extends AbstractHelper
             'vat_id' => '',
             'save_in_address_book' => 0
         ];
+
+        $region = $this->getDefaultRegionByCountry($countryCode);
+        if($region){
+            $defaultAddress['region'] = $region['title'];
+            $defaultAddress['region_id'] = $region['value'];
+        }
 
         $billingAddress = $defaultAddress;
         if(!empty($quote->getBillingAddress())){
@@ -388,5 +402,18 @@ class Order extends AbstractHelper
         } else {
             return $countries[$code];
         }
+    }
+
+    /**
+     * @param $countryCode
+     * @return mixed|null
+     */
+    public function getDefaultRegionByCountry($countryCode) {
+        $regionCollection = $this->country->loadByCode($countryCode)->getRegions();
+        $regions = $regionCollection->loadData()->toOptionArray(true);
+        if(is_array($regions) && isset($regions[1])){
+            return $regions[1];
+        }
+        return null;
     }
 }
