@@ -631,7 +631,7 @@ class QuickPayAdapter
         $paymentArray = $payments->asArray();
         $this->logger->debug(json_encode($paymentArray));
 
-        if($status != self::STATUS_ACCEPTED_CODE
+        /*if($status != self::STATUS_ACCEPTED_CODE
             && ($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_ANYDAY
                 || $order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_KLARNA)){
 
@@ -640,7 +640,7 @@ class QuickPayAdapter
             } elseif($type == self::REFUND_CODE) {
                 throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: payment not refunded'));
             }
-        }
+        }*/
 
         if(isset($paymentArray['operations'])){
             foreach($paymentArray['operations'] as $operation){
