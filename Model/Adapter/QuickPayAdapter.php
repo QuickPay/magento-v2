@@ -631,28 +631,27 @@ class QuickPayAdapter
         $paymentArray = $payments->asArray();
         $this->logger->debug(json_encode($paymentArray));
 
-        /*if($status != self::STATUS_ACCEPTED_CODE
-            && ($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_ANYDAY
-                || $order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_KLARNA)){
-
-            if($type == self::CAPTURE_CODE){
-                throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: payment not captured'));
-            } elseif($type == self::REFUND_CODE) {
-                throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: payment not refunded'));
-            }
-        }*/
-
-        if(isset($paymentArray['operations'])){
-            foreach($paymentArray['operations'] as $operation){
-                if(!empty($operation['qp_status_code']) && $operation['type'] == $type){
-                    if(in_array($operation['qp_status_code'], static::$errorCodes)){
-                        throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: '.$operation['qp_status_msg']));
-                    }
+        if($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_ANYDAY){
+            if($status != self::STATUS_ACCEPTED_CODE){
+                if($type == self::CAPTURE_CODE){
+                    throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: payment not captured'));
+                } elseif($type == self::REFUND_CODE) {
+                    throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: payment not refunded'));
                 }
             }
         } else {
-            /** IK: we process validation errors from payment gateway */
-            throw new \Magento\Framework\Exception\LocalizedException(new Phrase(__('QuickPay').' '.$this->_generateErrorMessageLine($paymentArray)));
+            if (isset($paymentArray['operations'])) {
+                foreach ($paymentArray['operations'] as $operation) {
+                    if (!empty($operation['qp_status_code']) && $operation['type'] == $type) {
+                        if (in_array($operation['qp_status_code'], static::$errorCodes)) {
+                            throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: ' . $operation['qp_status_msg']));
+                        }
+                    }
+                }
+            } else {
+                /** IK: we process validation errors from payment gateway */
+                throw new \Magento\Framework\Exception\LocalizedException(new Phrase(__('QuickPay') . ' ' . $this->_generateErrorMessageLine($paymentArray)));
+            }
         }
     }
 }
