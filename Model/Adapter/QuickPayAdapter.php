@@ -631,8 +631,9 @@ class QuickPayAdapter
 
         $paymentArray = $payments->asArray();
         $this->logger->debug(json_encode($paymentArray));
+        $paymentMethod = $order->getPayment()->getMethod();
 
-        if($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_ANYDAY){
+        if($paymentMethod == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_ANYDAY){
             if($status != self::STATUS_ACCEPTED_CODE){
                 if($type == self::CAPTURE_CODE){
                     throw new \Magento\Framework\Exception\LocalizedException(__('QuickPay: payment not captured'));
@@ -641,6 +642,9 @@ class QuickPayAdapter
                 }
             }
         } else {
+            if ($status == self::STATUS_ACCEPTED_CODE && empty($paymentArray) && in_array($paymentMethod, $this->allowedEmptyResponse())) {
+                return;
+            }
             if (isset($paymentArray['operations'])) {
                 foreach ($paymentArray['operations'] as $operation) {
                     if (!empty($operation['qp_status_code']) && $operation['type'] == $type) {
@@ -654,5 +658,11 @@ class QuickPayAdapter
                 throw new \Magento\Framework\Exception\LocalizedException(new Phrase(__('QuickPay') . ' ' . $this->_generateErrorMessageLine($paymentArray)));
             }
         }
+    }
+
+    public function allowedEmptyResponse() {
+        return [
+            \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_KLARNA
+        ];
     }
 }
