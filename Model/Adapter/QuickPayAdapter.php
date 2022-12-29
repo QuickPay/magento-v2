@@ -623,6 +623,7 @@ class QuickPayAdapter
     /**
      * @param $order
      * @param $payments
+     * @param $type
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function validateResponse($order, $payments, $type){
