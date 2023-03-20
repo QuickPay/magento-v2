@@ -13,7 +13,7 @@ use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Module\ResourceInterface;
 use QuickPay\QuickPay;
-use Zend_Locale;
+use Magento\Directory\Model\CountryFactory;
 use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
 
 /**
@@ -96,6 +96,11 @@ class QuickPayAdapter
     protected $taxItem;
 
     /**
+     * @var \Magento\Directory\Model\CountryFactory
+     */
+    protected $countryFactory;
+
+    /**
      * QuickPayAdapter constructor.
      *
      * @param LoggerInterface $logger
@@ -113,7 +118,8 @@ class QuickPayAdapter
         TransactionRepositoryInterface $transactionRepository,
         ResourceInterface $moduleResource,
         DirectoryList $dir,
-        Item $taxItem
+        Item $taxItem,
+        CountryFactory $countryFactory
     )
     {
         $this->logger = $logger;
@@ -126,6 +132,7 @@ class QuickPayAdapter
         $this->moduleResource = $moduleResource;
         $this->dir = $dir;
         $this->taxItem = $taxItem;
+        $this->countryFactory = $countryFactory;
     }
 
     /**
@@ -175,7 +182,7 @@ class QuickPayAdapter
 
             if($order->getPayment()->getMethod() != \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_PAYPAL) {
                 $shippingAddress = $order->getShippingAddress();
-
+                $country = $this->countryFactory->create()->loadByCode($shippingAddress->getCountryId());
                 $taxItems = $this->taxItem->getTaxItemsByOrderId($order->getId());
                 $shippingVatRate = 0;
                 if (is_array($taxItems)) {
@@ -195,7 +202,7 @@ class QuickPayAdapter
                     $form['shipping_address']['city'] = $shippingAddress->getCity();
                     $form['shipping_address']['zip_code'] = $shippingAddress->getPostcode();
                     $form['shipping_address']['region'] = $shippingAddress->getRegionCode();
-                    $form['shipping_address']['country_code'] = Zend_Locale::getTranslation($shippingAddress->getCountryId(), 'Alpha3ToTerritory');
+                    $form['shipping_address']['country_code'] = $country->getData('iso3_code');
                     $form['shipping_address']['phone_number'] = $shippingAddress->getTelephone();
                     $form['shipping_address']['email'] = $shippingAddress->getEmail();
                     $form['shipping_address']['house_number'] = '';
@@ -221,7 +228,7 @@ class QuickPayAdapter
                 $form['invoice_address']['city'] = $billingAddress->getCity();
                 $form['invoice_address']['zip_code'] = $billingAddress->getPostcode();
                 $form['invoice_address']['region'] = $billingAddress->getRegionCode();
-                $form['invoice_address']['country_code'] = Zend_Locale::getTranslation($billingAddress->getCountryId(), 'Alpha3ToTerritory');
+                $form['invoice_address']['country_code'] = $country->getData('iso3_code');
                 $form['invoice_address']['phone_number'] = $billingAddress->getTelephone();
                 $form['invoice_address']['email'] = $billingAddress->getEmail();
                 $form['invoice_address']['house_number'] = '';
