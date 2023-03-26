@@ -1,6 +1,6 @@
 .quickpay-logo {
     height: 25px;
-    margin: 5px; /* add spacing around logo */
+    margin-left: 5px;
 }
 .mobilepay-wrapper {
     margin-bottom: 40px;
@@ -21,9 +21,8 @@
     margin: auto;
     top:50%;
 }
-
-/* Module payment logo align  */
 .onestepcheckout-index-index .page-main .checkout-container img.quickpay-logo {
     display: inline-block;
     vertical-align: top;
+    margin: 5px;
 }

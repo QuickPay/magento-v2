@@ -101,12 +101,17 @@ class QuickPayAdapter
     protected $countryFactory;
 
     /**
-     * QuickPayAdapter constructor.
-     *
      * @param LoggerInterface $logger
      * @param UrlInterface $url
      * @param ScopeConfigInterface $scopeConfig
      * @param ResolverInterface $resolver
+     * @param OrderRepositoryInterface $orderRepository
+     * @param BuilderInterface $transactionBuilder
+     * @param TransactionRepositoryInterface $transactionRepository
+     * @param ResourceInterface $moduleResource
+     * @param DirectoryList $dir
+     * @param Item $taxItem
+     * @param CountryFactory $countryFactory
      */
     public function __construct(
         LoggerInterface $logger,
@@ -182,7 +187,7 @@ class QuickPayAdapter
 
             if($order->getPayment()->getMethod() != \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_PAYPAL) {
                 $shippingAddress = $order->getShippingAddress();
-                $country = $this->countryFactory->create()->loadByCode($shippingAddress->getCountryId());
+                $shippingCountry = $this->countryFactory->create()->loadByCode($shippingAddress->getCountryId());
                 $taxItems = $this->taxItem->getTaxItemsByOrderId($order->getId());
                 $shippingVatRate = 0;
                 if (is_array($taxItems)) {
@@ -202,7 +207,7 @@ class QuickPayAdapter
                     $form['shipping_address']['city'] = $shippingAddress->getCity();
                     $form['shipping_address']['zip_code'] = $shippingAddress->getPostcode();
                     $form['shipping_address']['region'] = $shippingAddress->getRegionCode();
-                    $form['shipping_address']['country_code'] = $country->getData('iso3_code');
+                    $form['shipping_address']['country_code'] = $shippingCountry->getData('iso3_code');
                     $form['shipping_address']['phone_number'] = $shippingAddress->getTelephone();
                     $form['shipping_address']['email'] = $shippingAddress->getEmail();
                     $form['shipping_address']['house_number'] = '';
@@ -216,6 +221,7 @@ class QuickPayAdapter
                 ];
 
                 $billingAddress = $order->getBillingAddress();
+                $billingCountry = $this->countryFactory->create()->loadByCode($billingAddress->getCountryId());
                 $mobileNumber = '';
                 if($order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_MOBILEPAY
                     || $order->getPayment()->getMethod() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE) {
@@ -228,7 +234,7 @@ class QuickPayAdapter
                 $form['invoice_address']['city'] = $billingAddress->getCity();
                 $form['invoice_address']['zip_code'] = $billingAddress->getPostcode();
                 $form['invoice_address']['region'] = $billingAddress->getRegionCode();
-                $form['invoice_address']['country_code'] = $country->getData('iso3_code');
+                $form['invoice_address']['country_code'] = $billingCountry->getData('iso3_code');
                 $form['invoice_address']['phone_number'] = $billingAddress->getTelephone();
                 $form['invoice_address']['email'] = $billingAddress->getEmail();
                 $form['invoice_address']['house_number'] = '';
