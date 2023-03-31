@@ -301,7 +301,7 @@ class QuickPayAdapter
 
             $parameters = [
                 "amount"             => $order->getBaseTotalDue() * 100,
-                "continueurl"        => $this->url->getUrl('quickpaygateway/payment/returns'),
+                "continueurl"        => $this->url->getUrl('quickpaygateway/payment/returns', ['order' => $order->getProtectCode()]),
                 "cancelurl"          => $this->url->getUrl('quickpaygateway/payment/cancel'),
                 "callbackurl"        => $this->url->getUrl('quickpaygateway/payment/callback'),
                 "customer_email"     => $order->getCustomerEmail(),
