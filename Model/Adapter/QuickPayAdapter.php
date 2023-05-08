@@ -187,7 +187,6 @@ class QuickPayAdapter
 
             if($order->getPayment()->getMethod() != \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_PAYPAL) {
                 $shippingAddress = $order->getShippingAddress();
-                $shippingCountry = $this->countryFactory->create()->loadByCode($shippingAddress->getCountryId());
                 $taxItems = $this->taxItem->getTaxItemsByOrderId($order->getId());
                 $shippingVatRate = 0;
                 if (is_array($taxItems)) {
@@ -201,6 +200,8 @@ class QuickPayAdapter
                 }
 
                 if ($shippingAddress) {
+                    $shippingCountry = $this->countryFactory->create()->loadByCode($shippingAddress->getCountryId());
+
                     $form['shipping_address'] = [];
                     $form['shipping_address']['name'] = $shippingAddress->getFirstName() . " " . $shippingAddress->getLastName();
                     $form['shipping_address']['street'] = $shippingAddress->getStreetLine(1);
