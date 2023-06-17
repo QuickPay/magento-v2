@@ -61,10 +61,22 @@ class Callback extends \Magento\Framework\App\Action\Action
     protected $dir;
 
     /**
-     * Class constructor
-     * @param \Magento\Framework\App\Action\Context              $context
-     * @param \Psr\Log\LoggerInterface                           $logger
+     * @var \QuickPay\Gateway\Helper\Order
+     */
+    protected $orderHelper;
+
+    /**
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Psr\Log\LoggerInterface $logger
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @param Order\Email\Sender\OrderSender $orderSender
+     * @param \QuickPay\Gateway\Model\Adapter\QuickPayAdapter $adapter
+     * @param \Magento\Sales\Model\Service\InvoiceService $invoiceService
+     * @param \Magento\Framework\DB\TransactionFactory $transactionFactory
+     * @param Order\Email\Sender\InvoiceSender $invoiceSender
+     * @param \Magento\Framework\App\Filesystem\DirectoryList $dir
+     * @param \QuickPay\Gateway\Helper\Order $orderHelper
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
