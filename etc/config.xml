@@ -32,6 +32,7 @@
                 <can_void>1</can_void>
                 <can_cancel>1</can_cancel>
                 <can_refund>1</can_refund>
+                <group>quickpay</group>
                 <apikey backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <mobilepay>
@@ -61,6 +62,7 @@
                 <can_void>1</can_void>
                 <can_cancel>1</can_cancel>
                 <can_refund>1</can_refund>
+                <group>quickpay</group>
             </quickpay_klarna>
             <quickpay_mobilepay>
                 <model>QuickPay\Gateway\Model\MobilePay</model>
@@ -79,6 +81,7 @@
                 <can_void>1</can_void>
                 <can_cancel>1</can_cancel>
                 <can_refund>1</can_refund>
+                <group>quickpay</group>
             </quickpay_mobilepay>
             <quickpay_vipps>
                 <model>QuickPay\Gateway\Model\Vipps</model>
@@ -96,6 +99,7 @@
                 <can_void>1</can_void>
                 <can_cancel>1</can_cancel>
                 <can_refund>1</can_refund>
+                <group>quickpay</group>
             </quickpay_vipps>
             <quickpay_paypal>
                 <model>QuickPay\Gateway\Model\PayPal</model>
@@ -113,6 +117,7 @@
                 <can_void>1</can_void>
                 <can_cancel>1</can_cancel>
                 <can_refund>1</can_refund>
+                <group>quickpay</group>
             </quickpay_paypal>
             <quickpay_viabill>
                 <model>QuickPay\Gateway\Model\ViaBill</model>
@@ -130,6 +135,7 @@
                 <can_void>1</can_void>
                 <can_cancel>1</can_cancel>
                 <can_refund>1</can_refund>
+                <group>quickpay</group>
             </quickpay_viabill>
             <quickpay_swish>
                 <model>QuickPay\Gateway\Model\Swish</model>
@@ -147,6 +153,7 @@
                 <can_void>1</can_void>
                 <can_cancel>1</can_cancel>
                 <can_refund>1</can_refund>
+                <group>quickpay</group>
             </quickpay_swish>
             <quickpay_trustly>
                 <model>QuickPay\Gateway\Model\Trustly</model>
@@ -165,6 +172,7 @@
                 <can_void>1</can_void>
                 <can_cancel>1</can_cancel>
                 <can_refund>1</can_refund>
+                <group>quickpay</group>
             </quickpay_trustly>
             <quickpay_anyday>
                 <model>QuickPay\Gateway\Model\Anyday</model>
@@ -182,6 +190,7 @@
                 <can_void>1</can_void>
                 <can_cancel>1</can_cancel>
                 <can_refund>1</can_refund>
+                <group>quickpay</group>
             </quickpay_anyday>
             <quickpay_applepay>
                 <model>QuickPay\Gateway\Model\ApplePay</model>
@@ -200,6 +209,7 @@
                 <can_void>1</can_void>
                 <can_cancel>1</can_cancel>
                 <can_refund>1</can_refund>
+                <group>quickpay</group>
             </quickpay_applepay>
             <quickpay_googlepay>
                 <model>QuickPay\Gateway\Model\GooglePay</model>
@@ -218,6 +228,7 @@
                 <can_void>1</can_void>
                 <can_cancel>1</can_cancel>
                 <can_refund>1</can_refund>
+                <group>quickpay</group>
             </quickpay_googlepay>
         </payment>
         <carriers>
