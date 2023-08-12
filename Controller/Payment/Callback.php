@@ -128,9 +128,12 @@ class Callback extends \Magento\Framework\App\Action\Action
             $this->logger->debug(json_encode((array)$response));
 
             //Fetch private key from config and validate checksum
-            $key = $this->scopeConfig->getValue(self::PRIVATE_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-            $autocapture = $this->scopeConfig->getValue(self::AUTOCAPTURE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-            $invoiceEmailSend = $this->scopeConfig->getValue(self::SEND_INVOICE_EMAIL_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $order = $this->order->loadByIncrementId($response->order_id);
+            $storeId = $order->getStoreId();
+
+            $key = $this->scopeConfig->getValue(self::PRIVATE_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
+            $autocapture = $this->scopeConfig->getValue(self::AUTOCAPTURE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
+            $invoiceEmailSend = $this->scopeConfig->getValue(self::SEND_INVOICE_EMAIL_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
             $checksum = hash_hmac('sha256', $body, $key);
             $submittedChecksum = $this->getRequest()->getServer('HTTP_QUICKPAY_CHECKSUM_SHA256');
 
@@ -146,7 +149,7 @@ class Callback extends \Magento\Framework\App\Action\Action
                     $order = $this->order->loadByIncrementId($response->order_id);
 
                     if($order->getPayment()->getMethodInstance()->getCode() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_TRUSTLY){
-                        if($this->scopeConfig->getValue(self::AUTOCAPTURE_TRUSTLY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)){
+                        if($this->scopeConfig->getValue(self::AUTOCAPTURE_TRUSTLY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId)){
                             $autocapture = true;
                         }
                     } else {
@@ -297,7 +300,7 @@ class Callback extends \Magento\Framework\App\Action\Action
             $feeBase = (float)$fee / 100;
             $feeTotal = $order->getStore()->getBaseCurrency()->convert($feeBase, $order->getOrderCurrencyCode());
 
-            $name = $this->scopeConfig->getValue(self::TRANSACTION_FEE_LABEL_XML_PATH);
+            $name = $this->scopeConfig->getValue(self::TRANSACTION_FEE_LABEL_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $order->getStoreId());
             $item->setName($name);
             $item->setBaseCost($feeBase);
             $item->setBasePrice($feeBase);

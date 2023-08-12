@@ -171,9 +171,10 @@ class QuickPayAdapter
     {
         try {
             $response = [];
+            $storeId = $order->getStoreId();
             $this->logger->debug('CREATE PAYMENT');
 
-            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
             $client = new QuickPay(":{$api_key}");
 
             $form = [
@@ -181,7 +182,7 @@ class QuickPayAdapter
                 'currency' => $order->getBaseCurrency()->ToString(),
             ];
 
-            if ($textOnStatement = $this->scopeConfig->getValue(self::TEXT_ON_STATEMENT_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
+            if ($textOnStatement = $this->scopeConfig->getValue(self::TEXT_ON_STATEMENT_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId)) {
                 $form['text_on_statement'] = $textOnStatement;
             }
 
@@ -308,10 +309,10 @@ class QuickPayAdapter
                 "customer_email"     => $order->getCustomerEmail(),
                 "autocapture"        => 0,
                 "payment_methods"    => $paymentMethods,
-                "branding_id"        => $this->scopeConfig->getValue(self::BRANDING_ID_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
+                "branding_id"        => $this->scopeConfig->getValue(self::BRANDING_ID_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId),
                 "language"           => $this->getLanguage(),
-                "auto_fee"           => $this->scopeConfig->isSetFlag(self::TRANSACTION_FEE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
-                "testmode"           => $this->scopeConfig->isSetFlag(self::TEST_MODE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                "auto_fee"           => $this->scopeConfig->isSetFlag(self::TRANSACTION_FEE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId),
+                "testmode"           => $this->scopeConfig->isSetFlag(self::TEST_MODE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId)
             ];
 
             if($area == 'adminhtml'){
