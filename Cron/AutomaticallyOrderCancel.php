@@ -54,7 +54,8 @@ class AutomaticallyOrderCancel
                 'state',
                 ['in' => [Order::STATE_PENDING_PAYMENT, Order::STATE_NEW]]
             )
-            ->addFieldToFilter('created_at', ['lteq' => $period]);
+            ->addFieldToFilter('created_at', ['lteq' => $period])
+            ->addFieldToFilter('remote_ip', ['neq' => 'NULL']);
 
         $collection->getSelect()
             ->join(

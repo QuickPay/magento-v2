@@ -84,7 +84,7 @@ class Returns extends \Magento\Framework\App\Action\Action
     {
         $area = $this->getRequest()->getParam('area');
         $order = $this->getOrder();
-        if($area == 'admin'){
+        if($area == \Magento\Framework\App\Area::AREA_ADMINHTML){
             $this->messageManager->addSuccess(__('Thank you for your purchase. You will soon receive a confirmation by email.'));
         }
 

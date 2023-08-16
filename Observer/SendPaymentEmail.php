@@ -71,7 +71,7 @@ class SendPaymentEmail implements ObserverInterface
     }
 
     public function savePaymentLink($order){
-        $response = $this->adapter->CreatePaymentLink($order, 'adminhtml');
+        $response = $this->adapter->CreatePaymentLink($order, \Magento\Framework\App\Area::AREA_ADMINHTML);
 
         if(isset($response['url'])){
             $payment = $order->getPayment();

@@ -15,6 +15,7 @@ use Magento\Framework\Module\ResourceInterface;
 use QuickPay\QuickPay;
 use Magento\Directory\Model\CountryFactory;
 use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class QuickPayAdapter
@@ -101,6 +102,11 @@ class QuickPayAdapter
     protected $countryFactory;
 
     /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * @param LoggerInterface $logger
      * @param UrlInterface $url
      * @param ScopeConfigInterface $scopeConfig
@@ -112,6 +118,7 @@ class QuickPayAdapter
      * @param DirectoryList $dir
      * @param Item $taxItem
      * @param CountryFactory $countryFactory
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         LoggerInterface $logger,
@@ -124,7 +131,8 @@ class QuickPayAdapter
         ResourceInterface $moduleResource,
         DirectoryList $dir,
         Item $taxItem,
-        CountryFactory $countryFactory
+        CountryFactory $countryFactory,
+        StoreManagerInterface $storeManager
     )
     {
         $this->logger = $logger;
@@ -138,6 +146,7 @@ class QuickPayAdapter
         $this->dir = $dir;
         $this->taxItem = $taxItem;
         $this->countryFactory = $countryFactory;
+        $this->storeManager=$storeManager;
     }
 
     /**
@@ -167,11 +176,13 @@ class QuickPayAdapter
      * @param array $attributes
      * @return array|bool
      */
-    public function CreatePaymentLink($order, $area = 'frontend')
+    public function CreatePaymentLink($order, $area = \Magento\Framework\App\Area::AREA_FRONTEND)
     {
         try {
+
             $response = [];
             $storeId = $order->getStoreId();
+
             $this->logger->debug('CREATE PAYMENT');
 
             $api_key = $this->scopeConfig->getValue(self::PUBLIC_KEY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
@@ -315,10 +326,10 @@ class QuickPayAdapter
                 "testmode"           => $this->scopeConfig->isSetFlag(self::TEST_MODE_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId)
             ];
 
-            if($area == 'adminhtml'){
-                $parameters['continueurl'] = $this->url->getBaseUrl().'quickpaygateway/payment/returns?area=admin';
-                $parameters['cancelurl'] = $this->url->getBaseUrl().'quickpaygateway/payment/cancel?area=admin';
-                $parameters['callbackurl'] = $this->url->getBaseUrl().'quickpaygateway/payment/callback';
+            if($area == \Magento\Framework\App\Area::AREA_ADMINHTML){
+                $parameters['continueurl'] = $this->storeManager->getStore($storeId)->getBaseUrl().'quickpaygateway/payment/returns?area='.$area;
+                $parameters['cancelurl'] = $this->storeManager->getStore($storeId)->getBaseUrl().'quickpaygateway/payment/cancel?area='.$area;
+                $parameters['callbackurl'] = $this->storeManager->getStore($storeId)->getBaseUrl().'quickpaygateway/payment/callback';
             }
 
             //Create payment link and return payment id

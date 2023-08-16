@@ -20,7 +20,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         $area = $this->getRequest()->getParam('area');
-        if($area == 'admin'){
+        if($area == \Magento\Framework\App\Area::AREA_ADMINHTML){
             $this->messageManager->addSuccess(__('Your order has been canceled.'));
         }
 
