@@ -224,7 +224,7 @@ class Callback extends \Magento\Framework\App\Action\Action
                     }
 
                     //Add transaction fee if set
-                    if ($response->fee > 0) {
+                    if (isset($response->fee) && $response->fee > 0) {
                         $this->addTransactionFee($order, $response->fee);
                     }
 
