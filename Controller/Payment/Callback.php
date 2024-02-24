@@ -3,7 +3,6 @@
 namespace QuickPay\Gateway\Controller\Payment;
 
 use Magento\Sales\Model\Order;
-use Zend\Json\Json;
 
 class Callback extends \Magento\Framework\App\Action\Action
 {
@@ -124,7 +123,7 @@ class Callback extends \Magento\Framework\App\Action\Action
         $this->logger->debug('CALLBACK');
         $body = $this->getRequest()->getContent();
         try {
-            $response = Json::decode($body);
+            $response = json_decode($body);
             $this->logger->debug(json_encode((array)$response));
 
             //Fetch private key from config and validate checksum
