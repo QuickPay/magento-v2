@@ -165,14 +165,6 @@ class Callback extends \Magento\Framework\App\Action\Action
                         }
                     }
 
-                    if($response->facilitator == 'mobilepay'){
-                        $order = $this->orderHelper->updateOrderByCallback($order, $response);
-
-                        $order->addStatusHistoryComment(__('Order was created from MobilePay Checkout'))
-                            ->setIsCustomerNotified(true)
-                            ->save();
-                    }
-
                     if (!$order->getId()) {
                         $this->logger->debug('Failed to load order with id: ' . $response->order_id);
                         return;

@@ -56,15 +56,6 @@
                                                 </item>
                                             </item>
                                         </item>
-                                        <item name="shipping-step" xsi:type="array">
-                                            <item name="children" xsi:type="array">
-                                                <item name="shippingAddress" xsi:type="array">
-                                                    <item name="config" xsi:type="array">
-                                                        <item name="shippingMethodItemTemplate" xsi:type="string">QuickPay_Gateway/shipping/shipping-method-item</item>
-                                                    </item>
-                                                </item>
-                                            </item>
-                                        </item>
                                     </item>
                                 </item>
                             </item>
@@ -73,8 +64,5 @@
                 </argument>
             </arguments>
         </referenceBlock>
-        <referenceContainer name="content">
-            <block class="QuickPay\Gateway\Block\Checkout\MobilePay" name="quickpay.mobilepay" template="QuickPay_Gateway::checkout/mobilepay.phtml" before="checkout.root" cacheable="false" ifconfig="payment/quickpay_gateway/mobilepay/active"/>
-        </referenceContainer>
     </body>
 </page>
