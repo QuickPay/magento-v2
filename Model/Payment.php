@@ -105,7 +105,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $adapter = $objectManager->get(\QuickPay\Gateway\Model\Adapter\QuickPayAdapter::class);
-        $parts = explode('-',$payment->getTransactionId());
+        $parts = $this->splitTransactionId($payment);
         $order = $payment->getOrder();
         $transaction = $parts[0];
 
@@ -132,7 +132,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $adapter = $objectManager->get(\QuickPay\Gateway\Model\Adapter\QuickPayAdapter::class);
-        $parts = explode('-',$payment->getTransactionId());
+        $parts = $this->splitTransactionId($payment);
         $order = $payment->getOrder();
         $transaction = $parts[0];
 
@@ -157,7 +157,7 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $adapter = $objectManager->get(\QuickPay\Gateway\Model\Adapter\QuickPayAdapter::class);
-        $parts = explode('-',$payment->getTransactionId());
+        $parts = $this->splitTransactionId($payment);
         $order = $payment->getOrder();
         $transaction = $parts[0];
 
@@ -170,5 +170,10 @@ class Payment extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         return $this;
+    }
+
+    public function splitTransactionId($payment)
+    {
+        return explode('-',$payment->getTransactionId() ?? '');
     }
 }
