@@ -21,6 +21,7 @@ final class ConfigProvider implements ConfigProviderInterface
     const CODE_GOOGLEPAY = 'quickpay_googlepay';
 
     const XML_PATH_CARD_LOGO = 'payment/quickpay_gateway/cardlogos';
+    const XML_PATH_DESCRIPTION = 'payment/%s/description';
 
     protected $scopeConfig;
 
@@ -45,37 +46,48 @@ final class ConfigProvider implements ConfigProviderInterface
             'payment' => [
                 self::CODE => [
                     'redirectUrl' => 'quickpaygateway/payment/redirect',
-                    'paymentLogo' => $this->getQuickPayCardLogo()
+                    'paymentLogo' => $this->getQuickPayCardLogo(),
+                    'description' => $this->getDescription(self::CODE)
                 ],
                 self::CODE_KLARNA => [
-                    'paymentLogo' => $this->getKlarnaLogo()
+                    'paymentLogo' => $this->getKlarnaLogo(),
+                    'description' => $this->getDescription(self::CODE_KLARNA)
                 ],
                 self::CODE_APPLEPAY => [
-                    'paymentLogo' => $this->getApplePayLogo()
+                    'paymentLogo' => $this->getApplePayLogo(),
+                    'description' => $this->getDescription(self::CODE_APPLEPAY)
                 ],
                 self::CODE_MOBILEPAY => [
-                    'paymentLogo' => $this->getMobilePayLogo()
+                    'paymentLogo' => $this->getMobilePayLogo(),
+                    'description' => $this->getDescription(self::CODE_MOBILEPAY)
                 ],
                 self::CODE_VIPPS => [
-                    'paymentLogo' => $this->getVippsLogo()
+                    'paymentLogo' => $this->getVippsLogo(),
+                    'description' => $this->getDescription(self::CODE_VIPPS)
                 ],
                 self::CODE_PAYPAL => [
-                    'paymentLogo' => $this->getPaypalLogo()
+                    'paymentLogo' => $this->getPaypalLogo(),
+                    'description' => $this->getDescription(self::CODE_PAYPAL)
                 ],
                 self::CODE_VIABILL => [
-                    'paymentLogo' => $this->getViaBillLogo()
+                    'paymentLogo' => $this->getViaBillLogo(),
+                    'description' => $this->getDescription(self::CODE_VIABILL)
                 ],
                 self::CODE_SWISH => [
-                    'paymentLogo' => $this->getSwishLogo()
+                    'paymentLogo' => $this->getSwishLogo(),
+                    'description' => $this->getDescription(self::CODE_SWISH)
                 ],
                 self::CODE_TRUSTLY => [
-                    'paymentLogo' => $this->getTrustlyLogo()
+                    'paymentLogo' => $this->getTrustlyLogo(),
+                    'description' => $this->getDescription(self::CODE_TRUSTLY)
                 ],
                 self::CODE_ANYDAY => [
-                    'paymentLogo' => $this->getAnydayLogo()
+                    'paymentLogo' => $this->getAnydayLogo(),
+                    'description' => $this->getDescription(self::CODE_ANYDAY)
                 ],
                 self::CODE_GOOGLEPAY => [
-                    'paymentLogo' => $this->getGooglePayLogo()
+                    'paymentLogo' => $this->getGooglePayLogo(),
+                    'description' => $this->getDescription(self::CODE_GOOGLEPAY)
                 ],
             ]
         ];
@@ -102,6 +114,11 @@ final class ConfigProvider implements ConfigProviderInterface
         }
 
         return $items;
+    }
+
+    public function getDescription($method){
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        return $this->scopeConfig->getValue(sprintf(self::XML_PATH_DESCRIPTION, $method), $storeScope);
     }
 
     public function getKlarnaLogo(){

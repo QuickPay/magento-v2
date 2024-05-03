@@ -44,6 +44,9 @@ define(
             getPaymentLogo: function () {
                 return window.checkoutConfig.payment.quickpay_paypal.paymentLogo;
             },
+            getDescription: function () {
+                return window.checkoutConfig.payment.quickpay_paypal.description;
+            }
         });
     }
 );

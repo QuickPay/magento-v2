@@ -44,6 +44,9 @@ define(
             getPaymentLogo: function () {
                 return window.checkoutConfig.payment.quickpay_trustly.paymentLogo;
             },
+            getDescription: function () {
+                return window.checkoutConfig.payment.quickpay_trustly.description;
+            }
         });
     }
 );

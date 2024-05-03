@@ -44,6 +44,9 @@ define(
             getPaymentLogo: function () {
                 return window.checkoutConfig.payment.quickpay_viabill.paymentLogo;
             },
+            getDescription: function () {
+                return window.checkoutConfig.payment.quickpay_viabill.description;
+            }
         });
     }
 );

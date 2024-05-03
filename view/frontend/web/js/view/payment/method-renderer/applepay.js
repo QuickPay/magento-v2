@@ -44,6 +44,9 @@ define(
             getPaymentLogo: function () {
                 return window.checkoutConfig.payment.quickpay_applepay.paymentLogo;
             },
+            getDescription: function () {
+                return window.checkoutConfig.payment.quickpay_applepay.description;
+            }
         });
     }
 );

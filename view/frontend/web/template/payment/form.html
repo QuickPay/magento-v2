@@ -13,6 +13,9 @@
         </label>
     </div>
     <div class="payment-method-content">
+        <!-- ko if: getDescription() -->
+        <p data-bind="html: getDescription()"></p>
+        <!-- /ko -->
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
