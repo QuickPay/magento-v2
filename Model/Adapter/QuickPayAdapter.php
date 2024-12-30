@@ -314,8 +314,8 @@ class QuickPayAdapter
 
             $parameters = [
                 "amount"             => $order->getBaseTotalDue() * 100,
-                "continueurl"        => $this->url->getUrl('quickpaygateway/payment/returns', ['order' => $order->getProtectCode()]),
-                "cancelurl"          => $this->url->getUrl('quickpaygateway/payment/cancel'),
+                "continueurl"        => $this->url->getUrl('quickpaygateway/payment/returns', ['order' => $order->getIncrementId()]),
+                "cancelurl"          => $this->url->getUrl('quickpaygateway/payment/cancel', ['order' => $order->getIncrementId()]),
                 "callbackurl"        => $this->url->getUrl('quickpaygateway/payment/callback'),
                 "customer_email"     => $order->getCustomerEmail(),
                 "autocapture"        => 0,
@@ -327,8 +327,8 @@ class QuickPayAdapter
             ];
 
             if($area == \Magento\Framework\App\Area::AREA_ADMINHTML){
-                $parameters['continueurl'] = $this->storeManager->getStore($storeId)->getBaseUrl().'quickpaygateway/payment/returns?area='.$area;
-                $parameters['cancelurl'] = $this->storeManager->getStore($storeId)->getBaseUrl().'quickpaygateway/payment/cancel?area='.$area;
+                $parameters['continueurl'] = $this->storeManager->getStore($storeId)->getBaseUrl().'quickpaygateway/payment/returns/order/'.$order->getIncrementId().'/area/'.$area;
+                $parameters['cancelurl'] = $this->storeManager->getStore($storeId)->getBaseUrl().'quickpaygateway/payment/cancel/order/'.$order->getIncrementId().'/area/'.$area;
                 $parameters['callbackurl'] = $this->storeManager->getStore($storeId)->getBaseUrl().'quickpaygateway/payment/callback';
             }
 

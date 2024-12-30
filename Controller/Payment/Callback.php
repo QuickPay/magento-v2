@@ -274,7 +274,7 @@ class Callback extends \Magento\Framework\App\Action\Action
      * @param Order $order
      * @param $fee
      */
-    private function addTransactionFee(Order $order, $fee)
+    protected function addTransactionFee(Order $order, $fee)
     {
         try {
             foreach ($order->getAllItems() as $orderItem) {
@@ -327,7 +327,7 @@ class Callback extends \Magento\Framework\App\Action\Action
      * @param $feeBase
      * @param $feeTotal
      */
-    private function updateTotals($order, $feeBase, $feeTotal)
+    protected function updateTotals($order, $feeBase, $feeTotal)
     {
         $order->setBaseGrandTotal($order->getBaseGrandTotal() + $feeBase);
         $order->setBaseSubtotal($order->getBaseSubtotal() + $feeBase);
@@ -342,7 +342,7 @@ class Callback extends \Magento\Framework\App\Action\Action
      *
      * @param \Magento\Sales\Model\Order $order
      */
-    private function sendOrderConfirmation($order)
+    protected function sendOrderConfirmation($order)
     {
         try {
             $this->orderSender->send($order);

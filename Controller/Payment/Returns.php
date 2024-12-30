@@ -5,43 +5,28 @@ namespace QuickPay\Gateway\Controller\Payment;
 class Returns extends \Magento\Framework\App\Action\Action
 {
     /**
-     * @var \Magento\Checkout\Model\Session
+     * @var \Magento\Sales\Api\Data\OrderInterface
      */
-    protected $_checkoutSession;
+    protected $order;
 
     /**
-     * @var \Magento\Sales\Model\OrderFactory
+     * @var \QuickPay\Gateway\Helper\Order
      */
-    protected $_orderFactory;
-
-    /**
-     * @var \Magento\Sales\Api\OrderRepositoryInterface
-     */
-    protected $_orderRepository;
-
-    /**
-     * @var \Magento\Framework\Api\SearchCriteriaBuilder
-     */
-    protected $_searchCriteriaBuilder;
+    protected $orderHelper;
 
     /**
      * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param \Magento\Sales\Model\OrderFactory $orderFactory
-     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
-     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @param \QuickPay\Gateway\Helper\Order $orderHelper
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Sales\Model\OrderFactory $orderFactory,
-        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
-    ) {
-        $this->_checkoutSession = $checkoutSession;
-        $this->_orderFactory = $orderFactory;
-        $this->_orderRepository = $orderRepository;
-        $this->_searchCriteriaBuilder = $searchCriteriaBuilder;
+        \Magento\Sales\Api\Data\OrderInterface $order,
+        \QuickPay\Gateway\Helper\Order $orderHelper
+    )
+    {
+        $this->order = $order;
+        $this->orderHelper = $orderHelper;
         parent::__construct($context);
     }
 
@@ -58,21 +43,11 @@ class Returns extends \Magento\Framework\App\Action\Action
      */
     public function getOrder()
     {
-        $order = null;
-        if($protectCode = $this->getRequest()->getParam('order')){
-            $searchCriteria = $this->_searchCriteriaBuilder->addFilter('protect_code', $protectCode)
-                ->setPageSize(1)
-                ->setCurrentPage(1)
-                ->create();
-            $resultOrders = $this->_orderRepository->getList($searchCriteria);
-
-            if ($resultOrders->getTotalCount() > 0) {
-                $orders = $resultOrders->getItems();
-                $order = current($orders);
-            }
+        if($incrementId = $this->getRequest()->getParam('order')){
+            return $this->order->loadByIncrementId($incrementId);
         }
 
-        return $order;
+        return false;
     }
 
     /**
@@ -83,12 +58,14 @@ class Returns extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         $area = $this->getRequest()->getParam('area');
-        $order = $this->getOrder();
         if($area == \Magento\Framework\App\Area::AREA_ADMINHTML){
             $this->messageManager->addSuccess(__('Thank you for your purchase. You will soon receive a confirmation by email.'));
         }
 
-        if($order && $order->getId()){
+        $order = $this->getOrder();
+        if ($order
+            && $order->getId()
+            && $this->orderHelper->getOrderIsQuickpay($order)) {
             $this->_getCheckout()->setLastOrderId($order->getId());
             $this->_getCheckout()->setLastQuoteId($order->getQuoteId());
             $this->_getCheckout()->setLastSuccessQuoteId($order->getQuoteId());
@@ -96,6 +73,8 @@ class Returns extends \Magento\Framework\App\Action\Action
 
             $this->_redirect('checkout/onepage/success');
         } else {
+            $this->messageManager->addError(__('Order not found.'));
+
             $this->_redirect('checkout/cart');
         }
     }

@@ -157,4 +157,16 @@ class Order extends AbstractHelper
         }
         return null;
     }
+
+    /**
+     * @param $order
+     * @return bool
+     */
+    public function getOrderIsQuickpay($order){
+        if(strpos($order->getPayment()->getMethodInstance()->getCode(), 'quickpay') !== false){
+            return true;
+        }
+
+        return false;
+    }
 }
