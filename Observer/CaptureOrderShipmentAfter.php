@@ -39,26 +39,27 @@ class CaptureOrderShipmentAfter implements ObserverInterface
 
             $payment = $order->getPayment();
             if (in_array($payment->getMethod(), [
-                ConfigProvider::CODE,
-                ConfigProvider::CODE_KLARNA,
-                ConfigProvider::CODE_MOBILEPAY,
-                ConfigProvider::CODE_VIPPS,
-                ConfigProvider::CODE_PAYPAL,
-                ConfigProvider::CODE_VIABILL,
-                ConfigProvider::CODE_SWISH,
-                ConfigProvider::CODE_TRUSTLY,
-                ConfigProvider::CODE_ANYDAY,
-                ConfigProvider::CODE_APPLEPAY,
-                ConfigProvider::CODE_GOOGLEPAY
-            ])) {
+                    ConfigProvider::CODE,
+                    ConfigProvider::CODE_KLARNA,
+                    ConfigProvider::CODE_MOBILEPAY,
+                    ConfigProvider::CODE_VIPPS,
+                    ConfigProvider::CODE_PAYPAL,
+                    ConfigProvider::CODE_VIABILL,
+                    ConfigProvider::CODE_SWISH,
+                    ConfigProvider::CODE_TRUSTLY,
+                    ConfigProvider::CODE_ANYDAY,
+                    ConfigProvider::CODE_APPLEPAY,
+                    ConfigProvider::CODE_GOOGLEPAY
+                ]) && $payment->getLastTransId() && $payment->canCapture()) {
+
                 $parts = explode('-', $payment->getLastTransId() ?? '');
                 $order = $payment->getOrder();
-                $transaction = $parts[0];
-
+                $transactionId = $parts[0];
                 try {
-                    $this->adapter->capture($order, $transaction, $order->getGrandTotal());
+                    $this->adapter->capture($order, $transactionId, $order->getGrandTotal());
+                    $this->adapter->createTransaction($order, $transactionId, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE);
                 } catch (LocalizedException $e) {
-                    //throw new LocalizedException(__($e->getMessage()));
+                    throw new LocalizedException(__($e->getMessage()));
                 }
             }
         }
