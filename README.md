@@ -10,6 +10,7 @@ We highly suggest to test it on a staging/development environment first.
 
 Tested on Magento 2.3 / 2.4 (PHP version up to 8.3).
 Compatible with Magento 2.4.8-p1
+
 If you have trouble running it on an older Magento version, please, try to update it first.
 
 ### Installation
