@@ -120,11 +120,11 @@ class Callback extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $this->logger->debug('CALLBACK');
+        $this->logger->debug('QUICKPAY: CALLBACK PROCESS');
         $body = $this->getRequest()->getContent();
         try {
             $response = json_decode($body);
-            $this->logger->debug(json_encode((array)$response));
+            $this->logger->debug('QUICKPAY: '. json_encode((array)$response));
 
             //Fetch private key from config and validate checksum
             $order = $this->order->loadByIncrementId($response->order_id);
@@ -166,7 +166,7 @@ class Callback extends \Magento\Framework\App\Action\Action
                     }
 
                     if (!$order->getId()) {
-                        $this->logger->debug('Failed to load order with id: ' . $response->order_id);
+                        $this->logger->debug('QUICKPAY: Failed to load order with id: ' . $response->order_id);
                         return;
                     }
 
@@ -180,7 +180,7 @@ class Callback extends \Magento\Framework\App\Action\Action
                         \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 
                     if (!$testMode && $response->test_mode === true) {
-                        $this->logger->debug('Order attempted paid with a test card but testmode is disabled.');
+                        $this->logger->debug('QUICKPAY: Order attempted paid with a test card but testmode is disabled.');
                         if (!$order->isCanceled()) {
                             $order->registerCancellation("Order attempted paid with test card")->save();
                         }
@@ -254,16 +254,22 @@ class Callback extends \Magento\Framework\App\Action\Action
 
                     //Send order email
                     if (!$order->getEmailSent()) {
+                        $this->logger->debug('QUICKPAY: Confirmation Email Start');
+
                         $this->sendOrderConfirmation($order);
+
+                        $this->logger->debug('QUICKPAY: Confirmation Email End');
                     }
 
+                    $this->logger->debug('QUICKPAY: CALLBACK SUCCESS');
                     $this->getResponse()->setBody("OK");
                 }
             } else {
-                $this->logger->debug('Checksum mismatch');
+                $this->logger->debug('QUICKPAY: Checksum mismatch');
                 return;
             }
         } catch (\Exception $e) {
+            $this->logger->debug('QUICKPAY: '.$e->getMessage());
             $this->logger->critical($e->getMessage());
         }
     }

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * QuickPay Gateway - Hyva Checkout Compatibility
+ * Override Hyva checkout layout to add QuickPay redirect functionality
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+>
+    <body>
+        <!-- Add QuickPay redirect functionality to Hyva checkout -->
+        <referenceBlock name="hyva.checkout.init-payment.after">
+            <block name="quickpay.hyva.checkout.redirect"
+                   template="QuickPay_Gateway::hyva/checkout/redirect.phtml"
+            />
+        </referenceBlock>
+    </body>
+</page>

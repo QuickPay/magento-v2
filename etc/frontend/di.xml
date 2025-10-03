@@ -1,5 +1,13 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<!--
+/**
+ * QuickPay Gateway DI Configuration
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    
+    <!-- ConfigProvider for checkout configuration -->
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
@@ -7,7 +15,24 @@
             </argument>
         </arguments>
     </type>
+    
+    <!-- CSRF Validator Plugin -->
     <type name="Magento\Framework\App\Request\CsrfValidator">
         <plugin name="csrf_validator_skip" type="QuickPay\Gateway\Plugin\CsrfValidatorSkip" />
     </type>
+    
+    <!-- Plugin to handle QuickPay redirect in Hyva checkout -->
+    <type name="Hyva\Checkout\Model\Magewire\Payment\PlaceOrderServiceProcessor">
+        <plugin name="quickpay_hyva_checkout_redirect"
+                type="QuickPay\Gateway\Plugin\Hyva\Checkout\PlaceOrderServiceProcessorPlugin"
+                sortOrder="10"/>
+    </type>
+    
+    <!-- Plugin to add QuickPay metadata to Hyva checkout payment methods -->
+    <type name="Hyva\Checkout\ViewModel\Checkout\Payment\MethodList">
+        <plugin name="quickpay_hyva_checkout_metadata"
+                type="QuickPay\Gateway\Plugin\Hyva\Checkout\MethodListPlugin"
+                sortOrder="10"/>
+    </type>
+    
 </config>

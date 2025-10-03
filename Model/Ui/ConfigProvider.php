@@ -46,47 +46,58 @@ final class ConfigProvider implements ConfigProviderInterface
             'payment' => [
                 self::CODE => [
                     'redirectUrl' => 'quickpaygateway/payment/redirect',
-                    'paymentLogo' => $this->getQuickPayCardLogo(),
+                    'paymentLogoPath' => $this->getQuickPayCardLogo(),
+                    'paymentLogo' => $this->getPaymentLogoUrl($this->getQuickPayCardLogo()),
                     'description' => $this->getDescription(self::CODE)
                 ],
                 self::CODE_KLARNA => [
-                    'paymentLogo' => $this->getKlarnaLogo(),
+                    'paymentLogoPath' => $this->getKlarnaLogo(),
+                    'paymentLogo' => $this->getPaymentLogoUrl($this->getKlarnaLogo()),
                     'description' => $this->getDescription(self::CODE_KLARNA)
                 ],
                 self::CODE_APPLEPAY => [
-                    'paymentLogo' => $this->getApplePayLogo(),
+                    'paymentLogoPath' => $this->getApplePayLogo(),
+                    'paymentLogo' => $this->getPaymentLogoUrl($this->getApplePayLogo()),
                     'description' => $this->getDescription(self::CODE_APPLEPAY)
                 ],
                 self::CODE_MOBILEPAY => [
-                    'paymentLogo' => $this->getMobilePayLogo(),
+                    'paymentLogoPath' => $this->getMobilePayLogo(),
+                    'paymentLogo' => $this->getPaymentLogoUrl($this->getMobilePayLogo()),
                     'description' => $this->getDescription(self::CODE_MOBILEPAY)
                 ],
                 self::CODE_VIPPS => [
-                    'paymentLogo' => $this->getVippsLogo(),
+                    'paymentLogoPath' => $this->getVippsLogo(),
+                    'paymentLogo' => $this->getPaymentLogoUrl($this->getVippsLogo()),
                     'description' => $this->getDescription(self::CODE_VIPPS)
                 ],
                 self::CODE_PAYPAL => [
-                    'paymentLogo' => $this->getPaypalLogo(),
+                    'paymentLogoPath' => $this->getPaypalLogo(),
+                    'paymentLogo' => $this->getPaymentLogoUrl($this->getPaypalLogo()),
                     'description' => $this->getDescription(self::CODE_PAYPAL)
                 ],
                 self::CODE_VIABILL => [
-                    'paymentLogo' => $this->getViaBillLogo(),
+                    'paymentLogoPath' => $this->getViaBillLogo(),
+                    'paymentLogo' => $this->getPaymentLogoUrl($this->getViaBillLogo()),
                     'description' => $this->getDescription(self::CODE_VIABILL)
                 ],
                 self::CODE_SWISH => [
-                    'paymentLogo' => $this->getSwishLogo(),
+                    'paymentLogoPath' => $this->getSwishLogo(),
+                    'paymentLogo' => $this->getPaymentLogoUrl($this->getSwishLogo()),
                     'description' => $this->getDescription(self::CODE_SWISH)
                 ],
                 self::CODE_TRUSTLY => [
-                    'paymentLogo' => $this->getTrustlyLogo(),
+                    'paymentLogoPath' => $this->getTrustlyLogo(),
+                    'paymentLogo' => $this->getPaymentLogoUrl($this->getTrustlyLogo()),
                     'description' => $this->getDescription(self::CODE_TRUSTLY)
                 ],
                 self::CODE_ANYDAY => [
-                    'paymentLogo' => $this->getAnydayLogo(),
+                    'paymentLogoPath' => $this->getAnydayLogo(),
+                    'paymentLogo' => $this->getPaymentLogoUrl($this->getAnydayLogo()),
                     'description' => $this->getDescription(self::CODE_ANYDAY)
                 ],
                 self::CODE_GOOGLEPAY => [
-                    'paymentLogo' => $this->getGooglePayLogo(),
+                    'paymentLogoPath' => $this->getGooglePayLogo(),
+                    'paymentLogo' => $this->getPaymentLogoUrl($this->getGooglePayLogo()),
                     'description' => $this->getDescription(self::CODE_GOOGLEPAY)
                 ],
             ]
@@ -108,7 +119,7 @@ final class ConfigProvider implements ConfigProviderInterface
                     } else {
                         $ext = 'png';
                     }
-                    $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/logo/{$card}.{$ext}");
+                    $items[] = "QuickPay_Gateway::images/logo/{$card}.{$ext}";
                 }
             }
         }
@@ -121,82 +132,79 @@ final class ConfigProvider implements ConfigProviderInterface
         return $this->scopeConfig->getValue(sprintf(self::XML_PATH_DESCRIPTION, $method), $storeScope);
     }
 
+    public function getPaymentLogoUrl($logoList = []){
+        foreach($logoList as $key => $logo){
+            $logoList[$key] = $this->assetRepo->getUrl($logo);
+        }
+        return $logoList;
+    }
+
     public function getKlarnaLogo(){
         $items = [];
-
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/klarna.svg");
+        $items[] = "QuickPay_Gateway::images/klarna.svg";
 
         return $items;
     }
 
     public function getApplePayLogo(){
         $items = [];
-
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/apple-pay.svg");
+        $items[] = "QuickPay_Gateway::images/apple-pay.svg";
 
         return $items;
     }
 
     public function getMobilePayLogo(){
         $items = [];
-
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/mobilepay_payment.png");
+        $items[] = "QuickPay_Gateway::images/mobilepay_payment.png";
 
         return $items;
     }
 
     public function getVippsLogo(){
         $items = [];
-
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/vipps.png");
+        $items[] = "QuickPay_Gateway::images/vipps.png";
 
         return $items;
     }
 
     public function getPaypalLogo(){
         $items = [];
-
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/paypal.svg");
+        $items[] = "QuickPay_Gateway::images/paypal.svg";
 
         return $items;
     }
 
     public function getViaBillLogo(){
         $items = [];
-
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/viabill.png");
+        $items[] = "QuickPay_Gateway::images/viabill.png";
 
         return $items;
     }
 
     public function getSwishLogo(){
         $items = [];
-
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/swish.png");
+        $items[] = "QuickPay_Gateway::images/swish.png";
 
         return $items;
     }
 
     public function getTrustlyLogo(){
         $items = [];
-
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/trustly.svg");
+        $items[] = "QuickPay_Gateway::images/trustly.svg";
 
         return $items;
     }
 
     public function getAnydayLogo(){
         $items = [];
-
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/anydaysplit.svg");
+        $items[] = "QuickPay_Gateway::images/anydaysplit.svg";
 
         return $items;
     }
 
     public function getGooglePayLogo(){
         $items = [];
-
-        $items[] = $this->assetRepo->getUrl("QuickPay_Gateway::images/google-pay.svg");
+        $items[] = "QuickPay_Gateway::images/google-pay.svg";
 
         return $items;
     }
