@@ -2,15 +2,14 @@
 /**
  * QuickPay Gateway - Hyva Checkout MethodList Plugin
  * Automatically adds metadata from ConfigProvider to Hyva checkout payment methods
+ * Works with and without Hyva installation
  */
 
 declare(strict_types=1);
 
 namespace QuickPay\Gateway\Plugin\Hyva\Checkout;
 
-use Hyva\Checkout\Model\MethodMetaDataFactory;
-use Hyva\Checkout\Model\MethodMetaDataInterface;
-use Hyva\Checkout\ViewModel\Checkout\Payment\MethodList;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\View\Element\Template;
 use Magento\Quote\Api\Data\PaymentMethodInterface;
 use QuickPay\Gateway\Model\Ui\ConfigProvider;
@@ -24,8 +23,8 @@ class MethodListPlugin
 
     public function __construct(
         ConfigProvider $configProvider,
-        MethodMetaDataFactory $methodMetaDataFactory,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        $methodMetaDataFactory = null
     ) {
         $this->configProvider = $configProvider;
         $this->methodMetaDataFactory = $methodMetaDataFactory;
@@ -36,11 +35,16 @@ class MethodListPlugin
      * After getting method metadata, add QuickPay specific data from ConfigProvider
      */
     public function afterGetMethodMetaData(
-        MethodList $subject,
-        MethodMetaDataInterface $result,
+        $subject,
+        $result,
         Template $parent,
         PaymentMethodInterface $method
     ) {
+        // Check if Hyva classes are available
+        if (!interface_exists('Hyva\Checkout\Model\MethodMetaDataInterface') || 
+            !class_exists('Hyva\Checkout\Model\MethodMetaDataFactory')) {
+            return $result;
+        }
         $methodCode = $method->getCode();
 
         // Check if it's a QuickPay payment method

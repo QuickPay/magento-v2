@@ -2,15 +2,13 @@
 /**
  * QuickPay Gateway - Hyva Checkout Plugin
  * Handles redirect functionality for QuickPay payment methods in Hyva checkout
+ * Works with and without Hyva installation
  */
 
 declare(strict_types=1);
 
 namespace QuickPay\Gateway\Plugin\Hyva\Checkout;
 
-use Hyva\Checkout\Model\Magewire\Component\Evaluation\Redirect;
-use Hyva\Checkout\Model\Magewire\Component\EvaluationResultFactory;
-use Hyva\Checkout\Model\Magewire\Payment\PlaceOrderServiceProcessor;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\LocalizedException;
@@ -28,7 +26,7 @@ class PlaceOrderServiceProcessorPlugin
         CheckoutSession $checkoutSession,
         UrlInterface $urlBuilder,
         LoggerInterface $logger,
-        EvaluationResultFactory $evaluationResultFactory
+        $evaluationResultFactory = null
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->urlBuilder = $urlBuilder;
@@ -40,14 +38,20 @@ class PlaceOrderServiceProcessorPlugin
      * After successful order placement, check if QuickPay redirect is needed
      */
     public function afterProcess(
-        PlaceOrderServiceProcessor $subject,
+        $subject,
         $result,
         $component,
         $data = null
     ) {
+        // Check if Hyva classes are available
+        if (!class_exists('Hyva\Checkout\Model\Magewire\Component\Evaluation\Redirect') ||
+            !class_exists('Hyva\Checkout\Model\Magewire\Component\EvaluationResultFactory')) {
+            return $result;
+        }
+
         try {
             // Check if order was placed successfully
-            if ($subject->hasSuccess()) {
+            if (method_exists($subject, 'hasSuccess') && $subject->hasSuccess()) {
                 $order = $this->checkoutSession->getLastRealOrder();
 
                 if ($order && $order->getId()) {
@@ -60,14 +64,19 @@ class PlaceOrderServiceProcessorPlugin
                         $redirectUrl = $this->urlBuilder->getUrl('quickpaygateway/payment/redirect');
 
                         if ($redirectUrl) {
+                            // Get EvaluationResultFactory using ObjectManager
+                            $evaluationResultFactory = ObjectManager::getInstance()->get('Hyva\Checkout\Model\Magewire\Component\EvaluationResultFactory');
+
                             // Create redirect evaluation result
-                            $redirectResult = $this->evaluationResultFactory->create(
-                                Redirect::class,
+                            $redirectResult = $evaluationResultFactory->create(
+                                'Hyva\Checkout\Model\Magewire\Component\Evaluation\Redirect',
                                 ['url' => $redirectUrl]
                             );
 
                             // Add the redirect result to the component
-                            $component->getEvaluationResultBatch()->push($redirectResult);
+                            if (method_exists($component, 'getEvaluationResultBatch')) {
+                                $component->getEvaluationResultBatch()->push($redirectResult);
+                            }
                         }
                     }
                 }

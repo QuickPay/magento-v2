@@ -27,6 +27,7 @@
                 type="QuickPay\Gateway\Plugin\Hyva\Checkout\PlaceOrderServiceProcessorPlugin"
                 sortOrder="10"/>
     </type>
+
     
     <!-- Plugin to add QuickPay metadata to Hyva checkout payment methods -->
     <type name="Hyva\Checkout\ViewModel\Checkout\Payment\MethodList">
@@ -34,5 +35,6 @@
                 type="QuickPay\Gateway\Plugin\Hyva\Checkout\MethodListPlugin"
                 sortOrder="10"/>
     </type>
+
     
 </config>
