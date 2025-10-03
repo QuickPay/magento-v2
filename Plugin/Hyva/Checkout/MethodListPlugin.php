@@ -18,9 +18,9 @@ use Psr\Log\LoggerInterface;
 
 class MethodListPlugin
 {
-    private ConfigProvider $configProvider;
-    private MethodMetaDataFactory $methodMetaDataFactory;
-    private LoggerInterface $logger;
+    private $configProvider;
+    private $methodMetaDataFactory;
+    private $logger;
 
     public function __construct(
         ConfigProvider $configProvider,
@@ -40,7 +40,7 @@ class MethodListPlugin
         MethodMetaDataInterface $result,
         Template $parent,
         PaymentMethodInterface $method
-    ): MethodMetaDataInterface {
+    ) {
         $methodCode = $method->getCode();
 
         // Check if it's a QuickPay payment method

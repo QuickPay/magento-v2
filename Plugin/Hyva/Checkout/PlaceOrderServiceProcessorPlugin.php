@@ -19,10 +19,10 @@ use Psr\Log\LoggerInterface;
 
 class PlaceOrderServiceProcessorPlugin
 {
-    private CheckoutSession $checkoutSession;
-    private UrlInterface $urlBuilder;
-    private LoggerInterface $logger;
-    private EvaluationResultFactory $evaluationResultFactory;
+    private $checkoutSession;
+    private $urlBuilder;
+    private $logger;
+    private $evaluationResultFactory;
 
     public function __construct(
         CheckoutSession $checkoutSession,

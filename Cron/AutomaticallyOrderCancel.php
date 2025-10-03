@@ -42,7 +42,7 @@ class AutomaticallyOrderCancel
     /**
      * @return void
      */
-    public function execute(): void
+    public function execute()
     {
         $period = $this->getCancelPeriod();
         if(!$period){

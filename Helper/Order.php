@@ -122,7 +122,7 @@ class Order extends AbstractHelper
      *
      * @return string
      */
-    public function getCountryByWebsite(): string
+    public function getCountryByWebsite()
     {
         return $this->scopeConfig->getValue(
             self::CONFIG_COUNTRY_CODE_PATH,
