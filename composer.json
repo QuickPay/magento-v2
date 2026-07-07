@@ -8,7 +8,7 @@
     }
   ],
   "require": {
-    "quickpay/quickpay-php-client": "1.0.*"
+    "quickpay/quickpay-php-client": "^2.0"
   },
   "type": "magento2-module",
   "license": [

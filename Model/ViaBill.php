@@ -2,6 +2,8 @@
 
 namespace QuickPay\Gateway\Model;
 
+use Magento\Framework\Exception\LocalizedException;
+
 /**
  * Pay In Store payment method model
  */

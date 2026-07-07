@@ -16,6 +16,7 @@ use QuickPay\QuickPay;
 use Magento\Directory\Model\CountryFactory;
 use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
 use Magento\Store\Model\StoreManagerInterface;
+use Exception;
 
 /**
  * Class QuickPayAdapter
