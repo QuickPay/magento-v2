@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="checkout.payment.methods">
+            <block class="QuickPay\Gateway\Block\QuickPay" name="checkout.payment.method.quickpay_gateway" as="quickpay_gateway" template="QuickPay_Gateway::component/payment/method/quickpay.phtml">
+                <arguments>
+                    <argument name="method_code" xsi:type="string">quickpay_gateway</argument>
+                </arguments>
+            </block>
+            <block class="QuickPay\Gateway\Block\QuickPay" name="checkout.payment.method.quickpay_klarna" as="quickpay_klarna" template="QuickPay_Gateway::component/payment/method/quickpay.phtml">
+                <arguments>
+                    <argument name="method_code" xsi:type="string">quickpay_klarna</argument>
+                </arguments>
+            </block>
+            <block class="QuickPay\Gateway\Block\QuickPay" name="checkout.payment.method.quickpay_applepay" as="quickpay_applepay" template="QuickPay_Gateway::component/payment/method/quickpay.phtml">
+                <arguments>
+                    <argument name="method_code" xsi:type="string">quickpay_applepay</argument>
+                </arguments>
+            </block>
+            <block class="QuickPay\Gateway\Block\QuickPay" name="checkout.payment.method.quickpay_mobilepay" as="quickpay_mobilepay" template="QuickPay_Gateway::component/payment/method/quickpay.phtml">
+                <arguments>
+                    <argument name="method_code" xsi:type="string">quickpay_mobilepay</argument>
+                </arguments>
+            </block>
+            <block class="QuickPay\Gateway\Block\QuickPay" name="checkout.payment.method.quickpay_vipps" as="quickpay_vipps" template="QuickPay_Gateway::component/payment/method/quickpay.phtml">
+                <arguments>
+                    <argument name="method_code" xsi:type="string">quickpay_vipps</argument>
+                </arguments>
+            </block>
+            <block class="QuickPay\Gateway\Block\QuickPay" name="checkout.payment.method.quickpay_paypal" as="quickpay_paypal" template="QuickPay_Gateway::component/payment/method/quickpay.phtml">
+                <arguments>
+                    <argument name="method_code" xsi:type="string">quickpay_paypal</argument>
+                </arguments>
+            </block>
+            <block class="QuickPay\Gateway\Block\QuickPay" name="checkout.payment.method.quickpay_viabill" as="quickpay_viabill" template="QuickPay_Gateway::component/payment/method/quickpay.phtml">
+                <arguments>
+                    <argument name="method_code" xsi:type="string">quickpay_viabill</argument>
+                </arguments>
+            </block>
+            <block class="QuickPay\Gateway\Block\QuickPay" name="checkout.payment.method.quickpay_swish" as="quickpay_swish" template="QuickPay_Gateway::component/payment/method/quickpay.phtml">
+                <arguments>
+                    <argument name="method_code" xsi:type="string">quickpay_swish</argument>
+                </arguments>
+            </block>
+            <block class="QuickPay\Gateway\Block\QuickPay" name="checkout.payment.method.quickpay_trustly" as="quickpay_trustly" template="QuickPay_Gateway::component/payment/method/quickpay.phtml">
+                <arguments>
+                    <argument name="method_code" xsi:type="string">quickpay_trustly</argument>
+                </arguments>
+            </block>
+            <block class="QuickPay\Gateway\Block\QuickPay" name="checkout.payment.method.quickpay_anyday" as="quickpay_anyday" template="QuickPay_Gateway::component/payment/method/quickpay.phtml">
+                <arguments>
+                    <argument name="method_code" xsi:type="string">quickpay_anyday</argument>
+                </arguments>
+            </block>
+            <block class="QuickPay\Gateway\Block\QuickPay" name="checkout.payment.method.quickpay_googlepay" as="quickpay_googlepay" template="QuickPay_Gateway::component/payment/method/quickpay.phtml">
+                <arguments>
+                    <argument name="method_code" xsi:type="string">quickpay_googlepay</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>
