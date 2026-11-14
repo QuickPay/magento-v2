@@ -147,7 +147,10 @@ class Callback extends \Magento\Framework\App\Action\Action
                      */
                     $order = $this->order->loadByIncrementId($response->order_id);
 
+                    $captureCase = \Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE;
                     if($order->getPayment()->getMethodInstance()->getCode() == \QuickPay\Gateway\Model\Ui\ConfigProvider::CODE_TRUSTLY){
+                        //Trustly payments are captured by the acquirer and cannot be captured through the API
+                        $captureCase = \Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE;
                         if($this->scopeConfig->getValue(self::AUTOCAPTURE_TRUSTLY_XML_PATH, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId)){
                             $autocapture = true;
                         }
@@ -233,7 +236,10 @@ class Callback extends \Magento\Framework\App\Action\Action
                     if($autocapture) {
                         //Generate invoice
                         $invoice = $this->invoiceService->prepareInvoice($order);
-                        $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
+                        $invoice->setRequestedCaptureCase($captureCase);
+                        if ($captureCase === \Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE) {
+                            $invoice->setTransactionId($response->id);
+                        }
                         $invoice->register();
                         $invoice->getOrder()->setCustomerNoteNotify(false);
                         $invoice->getOrder()->setIsInProcess(true);
