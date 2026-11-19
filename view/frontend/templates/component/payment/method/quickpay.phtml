@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use QuickPay\Gateway\Block\QuickPay;
+
+/** @var Escaper $escaper */
+/** @var QuickPay $block */
+
+$methodCode = $block->getMethodCode();
+$config = $block->getPaymentConfigByMethod($methodCode);
+
+$logos = $config['paymentLogo'] ?? [];
+$description = $config['description'] ?? '';
+$label = $config['label'] ?? '';
+?>
+
+<?php /* The wire Payment Method directive is required to sit in the root DOM element. */ ?>
+<div class="quickpay-method" data-method="<?= $escaper->escapeHtmlAttr($methodCode) ?>">
+    <?php if (!empty($logos)): ?>
+        <div class="quickpay-logos flex flex-wrap items-center gap-1.5">
+            <?php foreach ($logos as $logo): ?>
+                <img src="<?= $escaper->escapeUrl($logo) ?>" alt="<?= $escaper->escapeHtmlAttr($label) ?>" width="50" height="33" />
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+    <?php if ($description): ?>
+        <div class="quickpay-description mt-3 p-4 mb-1 bg-gray-100 rounded-lg">
+            <?= $escaper->escapeHtml($description) ?>
+        </div>
+    <?php endif; ?>
+</div>
