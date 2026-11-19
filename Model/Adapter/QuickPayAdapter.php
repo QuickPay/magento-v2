@@ -230,7 +230,7 @@ class QuickPayAdapter
                 }
 
                 $form['shipping'] = [
-                    'amount' => $order->getBaseShippingInclTax() * 100,
+                    'amount' => $this->toMinorUnits($order->getBaseShippingInclTax()),
                     'vat_rate' => $shippingVatRate ? $shippingVatRate / 100 : 0
                 ];
 
@@ -266,7 +266,7 @@ class QuickPayAdapter
                         'qty' => (int)$item->getQtyOrdered(),
                         'item_no' => $item->getSku(),
                         'item_name' => $item->getName(),
-                        'item_price' => round($item->getBasePriceInclTax() - $discount, 2) * 100,
+                        'item_price' => $this->toMinorUnits($item->getBasePriceInclTax() - $discount),
                         'vat_rate' => $item->getTaxPercent() ? $item->getTaxPercent() / 100 : 0
                     ];
                 }
@@ -314,7 +314,7 @@ class QuickPayAdapter
             }
 
             $parameters = [
-                "amount"             => $order->getBaseTotalDue() * 100,
+                "amount"             => $this->toMinorUnits($order->getBaseTotalDue()),
                 "continue_url"       => $this->url->getUrl('quickpaygateway/payment/returns', ['order' => $order->getIncrementId()]),
                 "cancel_url"         => $this->url->getUrl('quickpaygateway/payment/cancel', ['order' => $order->getIncrementId()]),
                 "callback_url"       => $this->url->getUrl('quickpaygateway/payment/callback'),
@@ -393,7 +393,7 @@ class QuickPayAdapter
                     'qty' => (int)$item->getQtyOrdered(),
                     'item_no' => $item->getSku(),
                     'item_name' => $item->getName(),
-                    'item_price' => round($item->getBasePriceInclTax() - $discount, 2) * 100,
+                    'item_price' => $this->toMinorUnits($item->getBasePriceInclTax() - $discount),
                     'vat_rate' => $item->getTaxPercent() ? $item->getTaxPercent() / 100 : 0
                 ];
             }
@@ -401,7 +401,7 @@ class QuickPayAdapter
             //$form['shipping_address_selection'] = 1;
             if($shippingMethod){
                 $form['shipping']['method'] = $shippingMethod['code'];
-                $form['shipping']['amount'] = $shippingMethod['price'] * 100;
+                $form['shipping']['amount'] = $this->toMinorUnits($shippingMethod['price']);
             }
 
             $payments = $client->request->post('/payments', $form);
@@ -418,7 +418,7 @@ class QuickPayAdapter
             $paymentId = $paymentArray['id'];
 
             $parameters = [
-                "amount"             => $quote->getBaseGrandTotal() * 100,
+                "amount"             => $this->toMinorUnits($quote->getBaseGrandTotal()),
                 "continue_url"       => $this->url->getUrl('quickpaygateway/payment/returns'),
                 "cancel_url"         => $this->url->getUrl('quickpaygateway/payment/cancel'),
                 "callback_url"       => $this->url->getUrl('quickpaygateway/payment/callback'),
@@ -476,7 +476,7 @@ class QuickPayAdapter
 
         $form = [
             'id' => $transaction,
-            'amount' => $ammount * 100,
+            'amount' => $this->toMinorUnits($ammount),
         ];
 
         $payments = $client->request->post("/payments/{$transaction}/capture", $form);
@@ -532,7 +532,7 @@ class QuickPayAdapter
 
         $form = [
             'id' => $transaction,
-            'amount' => $ammount * 100,
+            'amount' => $this->toMinorUnits($ammount),
         ];
 
         $payments = $client->request->post("/payments/{$transaction}/refund", $form);
@@ -540,6 +540,18 @@ class QuickPayAdapter
         $this->validateResponse($order, $payments, self::REFUND_CODE);
 
         return $this;
+    }
+
+    /**
+     * Convert amount to minor units (cents), rounded to the 2-decimal payable amount
+     *
+     * @param float|string|null $amount
+     *
+     * @return int
+     */
+    private function toMinorUnits($amount)
+    {
+        return (int)round(round((float)$amount, 2) * 100);
     }
 
     /**
