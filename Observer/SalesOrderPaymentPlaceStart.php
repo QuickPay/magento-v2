@@ -13,18 +13,22 @@ class SalesOrderPaymentPlaceStart implements \Magento\Framework\Event\ObserverIn
     protected $scopeConfig;
 
     /**
-     * Prevent order emails from being sent prematurely
-     *
-     * @param Observer $observer
-     * @return void
+     * @var \Magento\Sales\Model\ResourceModel\Order
+     */
+    protected $orderResource;
+
+    /**
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Sales\Model\ResourceModel\Order $orderResource
      */
 
     public function __construct(
-        \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Sales\Model\ResourceModel\Order $orderResource
     )
     {
         $this->scopeConfig = $scopeConfig;
+        $this->orderResource = $orderResource;
     }
 
     public function execute(\Magento\Framework\Event\Observer $observer)
@@ -50,13 +54,13 @@ class SalesOrderPaymentPlaceStart implements \Magento\Framework\Event\ObserverIn
             if($emailSend) {
                 /** @var \Magento\Sales\Model\Order $order */
                 $order->setCanSendNewEmailFlag(true)
-                    ->setIsCustomerNotified(true)
-                    ->save();
+                    ->setIsCustomerNotified(true);
+                $this->orderResource->save($order);
             } else {
                 /** @var \Magento\Sales\Model\Order $order */
                 $order->setCanSendNewEmailFlag(false)
-                    ->setIsCustomerNotified(false)
-                    ->save();
+                    ->setIsCustomerNotified(false);
+                $this->orderResource->save($order);
             }
         }
     }

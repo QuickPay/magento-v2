@@ -75,7 +75,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
     /**
      * Redirect to to QuickPay
      *
-     * @return string
+     * @return void
      */
     public function execute()
     {

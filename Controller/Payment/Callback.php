@@ -65,6 +65,11 @@ class Callback extends \Magento\Framework\App\Action\Action
     protected $orderHelper;
 
     /**
+     * @var \Magento\Sales\Model\ResourceModel\Order
+     */
+    protected $orderResource;
+
+    /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Psr\Log\LoggerInterface $logger
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -76,6 +81,7 @@ class Callback extends \Magento\Framework\App\Action\Action
      * @param Order\Email\Sender\InvoiceSender $invoiceSender
      * @param \Magento\Framework\App\Filesystem\DirectoryList $dir
      * @param \QuickPay\Gateway\Helper\Order $orderHelper
+     * @param \Magento\Sales\Model\ResourceModel\Order $orderResource
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -88,7 +94,8 @@ class Callback extends \Magento\Framework\App\Action\Action
         \Magento\Framework\DB\TransactionFactory $transactionFactory,
         \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender,
         \Magento\Framework\App\Filesystem\DirectoryList $dir,
-        \QuickPay\Gateway\Helper\Order $orderHelper
+        \QuickPay\Gateway\Helper\Order $orderHelper,
+        \Magento\Sales\Model\ResourceModel\Order $orderResource
     )
     {
         $this->scopeConfig = $scopeConfig;
@@ -101,6 +108,7 @@ class Callback extends \Magento\Framework\App\Action\Action
         $this->transactionFactory = $transactionFactory;
         $this->invoiceSender = $invoiceSender;
         $this->orderHelper = $orderHelper;
+        $this->orderResource = $orderResource;
 
         parent::__construct($context);
     }
@@ -116,7 +124,7 @@ class Callback extends \Magento\Framework\App\Action\Action
     /**
      * Handle callback from QuickPay
      *
-     * @return string
+     * @return void
      */
     public function execute()
     {
@@ -182,7 +190,8 @@ class Callback extends \Magento\Framework\App\Action\Action
                     if (!$testMode && $response->test_mode === true) {
                         $this->logger->debug('QUICKPAY: Order attempted paid with a test card but testmode is disabled.');
                         if (!$order->isCanceled()) {
-                            $order->registerCancellation("Order attempted paid with test card")->save();
+                            $order->registerCancellation("Order attempted paid with test card");
+                            $this->orderResource->save($order);
                         }
                         return;
                     }
@@ -224,8 +233,8 @@ class Callback extends \Magento\Framework\App\Action\Action
 
                     if ($order->getState() !== $stateProcessing) {
                         $order->setState($stateProcessing)
-                            ->setStatus($order->getConfig()->getStateDefaultStatus($stateProcessing))
-                            ->save();
+                            ->setStatus($order->getConfig()->getStateDefaultStatus($stateProcessing));
+                        $this->orderResource->save($order);
                     }
 
                     $this->adapter->createTransaction($order, $response->id, \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH);

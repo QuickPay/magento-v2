@@ -48,7 +48,6 @@ class Order extends AbstractHelper
     protected $country;
 
     /**
-     * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\App\ResourceConnection $resource
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Magento\Quote\Model\QuoteManagement $quoteManagement
@@ -58,7 +57,6 @@ class Order extends AbstractHelper
      * @param \Magento\Directory\Model\Country $country
      */
     public function __construct(
-        \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\App\ResourceConnection $resource,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Quote\Model\QuoteManagement $quoteManagement,
